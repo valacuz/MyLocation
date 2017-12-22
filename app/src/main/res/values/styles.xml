@@ -1,0 +1,50 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="toolbar_theme">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:actionMenuTextColor">#FDFDFD</item>
+        <item name="colorControlNormal">#FDFDFD</item>
+    </style>
+
+    <style name="list_no_item">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/colorTextPrimary</item>
+        <item name="android:textSize">@dimen/no_item_font</item>
+    </style>
+
+    <style name="place_item_primary">
+        <item name="android:textColor">@color/colorTextPrimary</item>
+        <item name="android:textSize">@dimen/item_primary_font</item>
+    </style>
+
+    <style name="place_item_secondary">
+        <item name="android:textColor">@color/colorTextSecondary</item>
+        <item name="android:textSize">@dimen/item_secondary_font</item>
+    </style>
+
+    <style name="place_form_text">
+        <item name="android:background">@null</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textColor">@color/colorFormPrimary</item>
+        <item name="android:textColorHint">@color/colorFormSecondary</item>
+        <item name="android:textSize">@dimen/form_text_font</item>
+    </style>
+
+    <style name="place_form_text.readonly" parent="place_form_text">
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">false</item>
+        <item name="android:longClickable">false</item>
+    </style>
+
+    <style name="place_form_spinner">
+        <item name="android:padding">16dp</item>
+    </style>
+
+</resources>

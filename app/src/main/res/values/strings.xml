@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">My Places</string>
+
+    <string name="gmap_key" translatable="false">AIzaSyC_CkyaX4jPwmJtV02fJ3sGdJ0rUywS8z8</string>
+
+    <!-- Place List -->
+    <string name="no_item">No item</string>
+
+    <!-- Place item action -->
+    <string name="item_title">Select action</string>
+    <string-array name="item_choices">
+        <item>Show on map</item>
+        <item>Share</item>
+        <item>Delete this place</item>
+    </string-array>
+
+    <!-- Place Form -->
+    <string name="form_title_add">New place</string>
+    <string name="form_title_edit">Edit place</string>
+    <string name="form_menu_save">Save</string>
+
+    <string name="place_name">Place name</string>
+    <string name="place_coordinate">Coordinate</string>
+    <string name="place_type">Type</string>
+    <string name="place_favorite">Favorite</string>
+
+    <!-- Coordinate Picker -->
+    <string name="coordinate_title">Pick coordinate</string>
+</resources>

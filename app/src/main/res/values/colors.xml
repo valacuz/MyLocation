@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#00838F</color>
+    <color name="colorPrimaryDark">#005662</color>
+    <color name="colorAccent">#4FB3BF</color>
+
+    <color name="colorTextPrimary">#005662</color>
+    <color name="colorTextSecondary">#888888</color>
+
+    <color name="colorFormPrimary">#222222</color>
+    <color name="colorFormSecondary">#888888</color>
+    <color name="colorFormDivider">#DDDDDD</color>
+
+    <color name="colorPickerLine">#2299FF</color>
+</resources>

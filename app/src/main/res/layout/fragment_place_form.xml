@@ -1,0 +1,98 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.example.valacuz.mylocations.form.PlaceFormViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/text_name"
+            style="@style/place_form_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/place_name"
+            android:inputType="text"
+            android:minHeight="@dimen/form_widget_min_height"
+            android:text="@={viewModel.name}" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorFormDivider" />
+
+        <EditText
+            android:id="@+id/text_coordinate"
+            style="@style/place_form_text.readonly"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/place_coordinate"
+            android:inputType="text"
+            android:minHeight="@dimen/form_widget_min_height"
+            android:onClick="@{() -> viewModel.locationTextClick()}"
+            android:text="@{viewModel.coordinateString}" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorFormDivider" />
+
+        <android.support.v7.widget.AppCompatSpinner
+            android:id="@+id/spinner_type"
+            style="@style/place_form_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/place_type"
+            android:minHeight="@dimen/form_widget_min_height"
+            android:spinnerMode="dialog"
+            bind:type_items="@{viewModel.placeTypes}"
+            bind:type_pick="@={viewModel.selectedType}" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorFormDivider" />
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/layout_starred"
+            android:layout_width="match_parent"
+            android:layout_height="56dp">
+
+            <TextView
+                android:id="@+id/label_starred"
+                style="@style/place_form_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/place_favorite"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/switch_starred"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Switch
+                android:id="@+id/switch_starred"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:checked="@={viewModel.starred}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@+id/label_starred"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </android.support.constraint.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorFormDivider" />
+    </LinearLayout>
+</layout>

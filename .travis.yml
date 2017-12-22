@@ -1,0 +1,65 @@
+language: android
+jdk: oraclejdk8
+
+env:
+  global:
+    - BUILD_TOOL_VERSION=26.0.2
+    - ANDROID_API_LEVEL=26
+    - EMULATOR_API_LEVEL=25
+
+android:
+  components:
+    - tools # to get the new `repository-11.xml`
+    - tools # to install Android SDK tools 25+, latest, cannot get more granular control than this
+    # See https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943 for more details.
+    - platform-tools #latest
+
+    # build tools version
+    - build-tools-$BUILD_TOOL_VERSION
+
+    # Android SDK version
+    - android-$ANDROID_API_LEVEL
+
+    # Addition components
+    - extra-google-m2repository
+    - extra-google-google_play_service  # play service
+    - extra-android-support # support library
+    - extra-android-m2repository  # design library
+
+    # Specify system image
+    # - sys-img-armeabi-v7a-addon-google_apis-google-$EMULATOR_API_LEVEL
+    - sys-img-armeabi-v7a-android-$EMULATOR_API_LEVEL
+
+  # Accept licenses
+  licenses: 
+    - 'android-sdk-preview-license-52d11cd2'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
+
+before_script:
+  # Update android SDK
+  - echo y | android update sdk --no-ui --all --filter extra-google-m2repository
+  - echo y | android update sdk --no-ui --all --filter extra-google-google_play_service
+  - echo y | android update sdk --no-ui --all --filter extra-android-m2repository
+  - echo y | android update sdk --no-ui --all --filter extra-android-support
+  - echo y | android update sdk --no-ui --all --filter "android-$EMULATOR_API_LEVEL"
+  - echo y | android update sdk --no-ui --all --filter "build-tools-$BUILD_TOOL_VERSION"
+  - echo y | android update sdk --no-ui --all --filter "sys-img-armeabi-v7a-android-$EMULATOR_API_LEVEL"
+  # Create emulator
+  - echo no | android create avd --force -n test -t "android-$EMULATOR_API_LEVEL" --abi armeabi-v7a
+  # Start emulator
+  - emulator -avd test -no-skin -no-audio -no-window &
+
+script:
+  # Wait until emulator started
+  - android-wait-for-emulator
+  # Unlock emulator
+  - adb shell input keyevent 82
+  # Prevent emulator locking itself again
+  - adb shell svc power stayon true
+  # Make gradle output info-level logging, so the tests do not timeout
+  - ./gradlew connectCheck --info -PdisablePreDex;
+  # Run local unit test
+  - ./gradlew test
+  # Run Instrumented unit test
+  - ./gradlew connectedAndroidTest
