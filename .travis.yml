@@ -27,7 +27,7 @@ android:
 
     # Specify system image
     # - sys-img-armeabi-v7a-addon-google_apis-google-$EMULATOR_API_LEVEL
-    - sys-img-armeabi-v7a-android-$EMULATOR_API_LEVEL
+    - sys-img-armeabi-v7a-android-22
 
   # Accept licenses
   licenses: 
@@ -41,11 +41,11 @@ before_script:
   - echo y | android update sdk --no-ui --all --filter extra-google-google_play_service
   - echo y | android update sdk --no-ui --all --filter extra-android-m2repository
   - echo y | android update sdk --no-ui --all --filter extra-android-support
-  - echo y | android update sdk --no-ui --all --filter "android-$EMULATOR_API_LEVEL"
   - echo y | android update sdk --no-ui --all --filter "build-tools-$BUILD_TOOL_VERSION"
-  - echo y | android update sdk --no-ui --all --filter "sys-img-armeabi-v7a-android-$EMULATOR_API_LEVEL"
+  - echo y | android update sdk --no-ui --all --filter android-22
+  - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
   # Create emulator
-  - echo no | android create avd --force -n test -t "android-$EMULATOR_API_LEVEL" --abi armeabi-v7a
+  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
   # Start emulator
   - emulator -avd test -no-skin -no-audio -no-window &
 
