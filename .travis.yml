@@ -2,10 +2,9 @@ language: android
 jdk: oraclejdk8
 
 env:
-  global:
-    - BUILD_TOOL_VERSION=26.0.2
-    - ANDROID_API_LEVEL=26
-    - EMULATOR_API_LEVEL=25
+  - BUILD_TOOL_VERSION=26.0.2
+  - ANDROID_API_LEVEL=26
+  - EMULATOR_API_LEVEL=25
 
 android:
   components:
