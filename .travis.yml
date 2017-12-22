@@ -60,6 +60,6 @@ script:
   # Make gradle output info-level logging, so the tests do not timeout
   - ./gradlew connectCheck --info -PdisablePreDex;
   # Run local unit test
-  - ./gradlew test
+  # - ./gradlew test
   # Run Instrumented unit test
   - ./gradlew connectedAndroidTest
