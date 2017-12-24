@@ -1,6 +1,17 @@
 language: android
 jdk: oraclejdk8
 
+# Dependency caching in Gradle
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+
 android:
   components:
     - tools # to install Android SDK tools 25+, latest, cannot get more granular control than this
@@ -40,7 +51,7 @@ before_script:
   # Create emulator
   - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
   # Start emulator
-  - emulator -avd test -no-skin -no-audio -no-window &
+  - emulator -avd test -no-audio -no-window &
 
 script:
   # Wait until emulator started
@@ -50,8 +61,14 @@ script:
   # Prevent emulator locking itself again
   - adb shell svc power stayon true
   # Make gradle output info-level logging, so the tests do not timeout
-  - ./gradlew connectCheck --info -PdisablePreDex;
+  - ./gradlew build connectCheck --info -PdisablePreDex;
   # Run local unit test
   # - ./gradlew test
   # Run Instrumented unit test
   - ./gradlew connectedAndroidTest
+
+before_install:
+  - mkdir "$ANDROID_HOME/licenses" || true
+  # License agreement for 
+  - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+  - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
