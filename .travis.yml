@@ -1,23 +1,28 @@
 language: android
 jdk: oraclejdk8
 
-env:
-  - BUILD_TOOL_VERSION=26.0.2
-  - ANDROID_API_LEVEL=26
-  - EMULATOR_API_LEVEL=25
+# Dependency caching in Gradle
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
 
 android:
   components:
-    - tools # to get the new `repository-11.xml`
     - tools # to install Android SDK tools 25+, latest, cannot get more granular control than this
     # See https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943 for more details.
     - platform-tools #latest
 
     # build tools version
-    - build-tools-$BUILD_TOOL_VERSION
+    - build-tools-26.0.2
 
     # Android SDK version
-    - android-$ANDROID_API_LEVEL
+    - android-26
 
     # Addition components
     - extra-google-m2repository
@@ -26,12 +31,11 @@ android:
     - extra-android-m2repository  # design library
 
     # Specify system image
-    # - sys-img-armeabi-v7a-addon-google_apis-google-$EMULATOR_API_LEVEL
     - sys-img-armeabi-v7a-android-22
 
   # Accept licenses
   licenses: 
-    - 'android-sdk-preview-license-52d11cd2'
+    - 'android-sdk-preview-license-.+'
     - 'android-sdk-license-.+'
     - 'google-gdk-license-.+'
 
@@ -41,13 +45,13 @@ before_script:
   - echo y | android update sdk --no-ui --all --filter extra-google-google_play_service
   - echo y | android update sdk --no-ui --all --filter extra-android-m2repository
   - echo y | android update sdk --no-ui --all --filter extra-android-support
-  - echo y | android update sdk --no-ui --all --filter "build-tools-$BUILD_TOOL_VERSION"
+  - echo y | android update sdk --no-ui --all --filter build-tools-26.0.2
   - echo y | android update sdk --no-ui --all --filter android-22
   - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
   # Create emulator
   - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
   # Start emulator
-  - emulator -avd test -no-skin -no-audio -no-window &
+  - emulator -avd test -no-audio -no-window &
 
 script:
   # Wait until emulator started
@@ -57,8 +61,14 @@ script:
   # Prevent emulator locking itself again
   - adb shell svc power stayon true
   # Make gradle output info-level logging, so the tests do not timeout
-  - ./gradlew connectCheck --info -PdisablePreDex;
+  - ./gradlew build connectCheck --info -PdisablePreDex;
   # Run local unit test
   # - ./gradlew test
   # Run Instrumented unit test
   - ./gradlew connectedAndroidTest
+
+before_install:
+  - mkdir "$ANDROID_HOME/licenses" || true
+  # License agreement for 
+  - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
+  - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
