@@ -6,7 +6,6 @@ import android.support.v4.app.DialogFragment
 import android.support.v7.app.AlertDialog
 import android.widget.ArrayAdapter
 import com.example.valacuz.mylocations.R
-import com.example.valacuz.mylocations.SingletonHolder
 import com.example.valacuz.mylocations.data.PlaceItem
 
 class PlaceActionDialog : DialogFragment() {
@@ -45,9 +44,16 @@ class PlaceActionDialog : DialogFragment() {
         return this
     }
 
-    companion object : SingletonHolder<PlaceActionDialog, PlaceItem>({
-        PlaceActionDialog().setPlaceItem(it)
-    })
+    companion object {
+
+        @Volatile
+        private var INSTANCE: PlaceActionDialog? = null
+
+        fun getInstance(place: PlaceItem) =
+                INSTANCE ?: synchronized(this) {
+                    INSTANCE ?: PlaceActionDialog().setPlaceItem(place)
+                }
+    }
 
     interface Listener {
         fun onShowOnMapClick(place: PlaceItem)

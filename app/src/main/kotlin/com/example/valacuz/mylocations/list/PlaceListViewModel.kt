@@ -7,6 +7,8 @@ import android.databinding.ObservableList
 import com.example.valacuz.mylocations.BR
 import com.example.valacuz.mylocations.data.PlaceDataSource
 import com.example.valacuz.mylocations.data.PlaceItem
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 class PlaceListViewModel(itemDataSource: PlaceDataSource) : BaseObservable() {
 
@@ -42,11 +44,13 @@ class PlaceListViewModel(itemDataSource: PlaceDataSource) : BaseObservable() {
     }
 
     fun loadItems() {
-        val places = mItemDataSource.getAllPlaces()
-        places?.let {
-            items.clear()
-            items.addAll(it)
-            notifyPropertyChanged(BR.empty) // It's a @Bindable so update manually.
-        }
+        mItemDataSource.getAllPlaces()
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe({ places ->
+                    items.clear()
+                    items.addAll(places)
+                    notifyPropertyChanged(BR.empty) // It's a @Bindable so update manually.
+                })
     }
 }

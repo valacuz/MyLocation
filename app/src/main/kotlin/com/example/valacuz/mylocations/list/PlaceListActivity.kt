@@ -3,6 +3,9 @@ package com.example.valacuz.mylocations.list
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.VisibleForTesting
+import android.support.test.espresso.IdlingResource
+import android.support.test.espresso.idling.CountingIdlingResource
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import com.example.valacuz.mylocations.R
@@ -77,7 +80,7 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
                         }
 
                         override fun onShareClick(place: PlaceItem) {
-                            mShareContentSource.shareContent(place.name, place.latitude, place.longitude)
+                            mShareContentSource.shareContent(place.name!!, place.latitude, place.longitude)
                         }
 
                         override fun onDeleteClick(place: PlaceItem) {
@@ -129,5 +132,10 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
                     .commit()
         }
         return fragment
+    }
+
+    @VisibleForTesting
+    fun getCountingIdlingResource(): IdlingResource {
+        return CountingIdlingResource(PlaceListActivity::class.java.name)
     }
 }

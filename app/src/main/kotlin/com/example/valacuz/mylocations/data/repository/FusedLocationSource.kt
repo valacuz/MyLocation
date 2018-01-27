@@ -5,15 +5,12 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Looper
 import android.support.v4.content.ContextCompat
-import com.example.valacuz.mylocations.SingletonHolder
 import com.example.valacuz.mylocations.data.LocationProviderSource
 import com.google.android.gms.location.*
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
 class FusedLocationSource private constructor(context: Context) : LocationProviderSource {
-
-    private var mContext: Context = context.applicationContext
 
     private var mLocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
@@ -22,7 +19,7 @@ class FusedLocationSource private constructor(context: Context) : LocationProvid
     }
 
     private var mLocationClient: FusedLocationProviderClient = LocationServices
-            .getFusedLocationProviderClient(mContext)
+            .getFusedLocationProviderClient(context)
 
     private var mLocationRequest: LocationRequest = LocationRequest.create()
             .setInterval(5000)
@@ -34,8 +31,8 @@ class FusedLocationSource private constructor(context: Context) : LocationProvid
     override fun getObservableLocation(): Observable<Location> = mPublishSubject
 
     override fun startUpdates() {
-        val isPermissionGranted = ContextCompat.checkSelfPermission(
-                mContext, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val isPermissionGranted = ContextCompat.checkSelfPermission(mLocationClient.applicationContext,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
         if (isPermissionGranted) {
             mLocationClient.requestLocationUpdates(
@@ -47,7 +44,14 @@ class FusedLocationSource private constructor(context: Context) : LocationProvid
         mLocationClient.removeLocationUpdates(mLocationCallback)
     }
 
-    // Pass a reference to the private constructor of the singleton class.
-    // In this case use constructor as function reference (which contains Context)
-    companion object : SingletonHolder<FusedLocationSource, Context>(::FusedLocationSource)
+    companion object {
+
+        @Volatile
+        private var INSTANCE: FusedLocationSource? = null
+
+        fun getInstance(context: Context): FusedLocationSource =
+                INSTANCE ?: synchronized(this) {
+                    INSTANCE ?: FusedLocationSource(context.applicationContext)
+                }
+    }
 }

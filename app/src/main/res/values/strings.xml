@@ -24,6 +24,8 @@
     <string name="place_type">Type</string>
     <string name="place_favorite">Favorite</string>
 
+    <string name="msg_empty_name">Please input the place name</string>
+
     <!-- Coordinate Picker -->
     <string name="coordinate_title">Pick coordinate</string>
 </resources>

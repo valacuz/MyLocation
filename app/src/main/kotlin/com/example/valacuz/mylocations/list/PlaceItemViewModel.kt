@@ -14,7 +14,7 @@ class PlaceItemViewModel(placeItem: PlaceItem) : BaseObservable() {
     private val mPlace: PlaceItem = placeItem
 
     @Bindable
-    fun getName(): String = mPlace.name
+    fun getName(): String = mPlace.name!!
 
     @Bindable
     fun getType(): Int = mPlace.type

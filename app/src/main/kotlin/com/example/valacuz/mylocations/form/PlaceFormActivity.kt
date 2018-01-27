@@ -4,6 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.annotation.VisibleForTesting
+import android.support.test.espresso.IdlingResource
+import android.support.test.espresso.idling.CountingIdlingResource
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
@@ -108,7 +111,7 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
             holder.getViewModel()!!
         } else {
             val itemDataSource: PlaceDataSource = MemoryPlaceDataSource.INSTANCE
-            val viewModel = PlaceFormViewModel(itemDataSource, mPlaceId)
+            val viewModel = PlaceFormViewModel(this, itemDataSource, mPlaceId)
             supportFragmentManager
                     .beginTransaction()
                     .add(ViewModelHolder<PlaceFormViewModel>().createContainer(viewModel),
@@ -130,5 +133,10 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
                     .commit()
         }
         return fragment
+    }
+
+    @VisibleForTesting
+    fun getCountingIdlingResource(): IdlingResource {
+        return CountingIdlingResource(PlaceFormActivity::class.java.name)
     }
 }
