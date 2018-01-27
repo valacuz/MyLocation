@@ -31,7 +31,6 @@ android {
 }
 
 // Ensure kotlin code will not be used in production code.
-/*
 afterEvaluate {
     android.sourceSets.all { source ->
         if (!source.name.startsWith('test') || !source.name.startsWith('androidTest')) {
@@ -39,27 +38,50 @@ afterEvaluate {
         }
     }
 }
-*/
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    // Android support libraries
     implementation "com.android.support:appcompat-v7:$android_support_version"
     implementation "com.android.support:design:$android_support_version"
     implementation "com.android.support:recyclerview-v7:$android_support_version"
     implementation "com.android.support:support-v4:$android_support_version"
     implementation "com.android.support.constraint:constraint-layout:$android_constraint_version"
+
+    // Google play services
     implementation "com.google.android.gms:play-services-maps:$google_play_version"
     implementation "com.google.android.gms:play-services-location:$google_play_version"
+
+    // RxJava2
     implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlin_version"
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
+
+    // Android data binding
     kapt "com.android.databinding:compiler:$gradle_version"
 
-    testImplementation 'junit:junit:4.12'
+    // Espresso
+    implementation "com.android.support.test.espresso:espresso-idling-resource:$espresso_version"
 
+    // Room persistence
+    kapt "android.arch.persistence.room:compiler:$android_component_version"
+    implementation "android.arch.persistence.room:rxjava2:$android_component_version"
+    implementation "android.arch.persistence.room:runtime:$android_component_version"
+
+    // JUnit
+    testImplementation 'junit:junit:4.12'
     androidTestImplementation 'junit:junit:4.12'
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    // Room persistence for testing
+    androidTestImplementation "android.arch.core:core-testing:$android_component_version"
+    androidTestImplementation "android.arch.persistence.room:testing:$android_component_version"
+
+    //
+    androidTestImplementation "com.android.support.test:runner:$test_runner_version"
+    androidTestImplementation "com.android.support.test:rules:$test_rule_version"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso_version"
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$espresso_version"
+    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$espresso_version"
+    androidTestImplementation "com.android.support.test.espresso:espresso-idling-resource:$espresso_version"
 }

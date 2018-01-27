@@ -1,143 +1,160 @@
 package com.example.valacuz.mylocations
 
-import com.example.valacuz.mylocations.data.PlaceDataSource
+import android.arch.core.executor.testing.InstantTaskExecutorRule
+import android.arch.persistence.room.Room
+import android.support.test.InstrumentationRegistry
+import android.support.test.runner.AndroidJUnit4
 import com.example.valacuz.mylocations.data.PlaceItem
-import com.example.valacuz.mylocations.data.repository.MemoryPlaceDataSource
+import com.example.valacuz.mylocations.data.repository.room.AppDatabase
 import org.junit.After
-import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 @Suppress("FunctionName")
 class PlaceDataSourceTest {
 
-    private lateinit var mDataSource: PlaceDataSource
+    @get:Rule
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    private lateinit var mAppDatabase: AppDatabase
 
     @Before
     fun setup() {
-        mDataSource = MemoryPlaceDataSource.INSTANCE
+        mAppDatabase = Room
+                .inMemoryDatabaseBuilder(InstrumentationRegistry.getTargetContext(), AppDatabase::class.java)
+                .allowMainThreadQueries()   // Allow main thread queries, just for testing
+                .build()
     }
 
     @After
     fun cleanup() {
-        mDataSource.clearPlace()
-    }
-
-    @Test
-    fun testPrecondition() {
-        assertNotNull(mDataSource)
+        mAppDatabase.placeItemDao().clearPlaces()
+        mAppDatabase.close()
     }
 
     @Test
     fun addPlace_retrievePlace() {
-        // Given a new place
-        val place = PlaceItem("House", 13.7372904, 100.5380263, 1, true)
-
-        // When save it into repository
-        mDataSource.addPlace(place)
+        // Given a new place & When save it into repository
+        mAppDatabase.placeItemDao().addPlace(FIRST_PLACE)
 
         // Then the place can be retrieved from repository
-        val savedPlace = mDataSource.getById(place.id)
-
-        // And the place information retrieved from repository must equals to given information
-        if (savedPlace != null) {
-            assertEquals("House", savedPlace.name)
-            assertEquals(13.7372904, savedPlace.latitude, 0.001)
-            assertEquals(100.5380263, savedPlace.longitude, 0.001)
-            assertTrue(savedPlace.isStarred)
-        } else {
-            fail("Cannot retrieve place from given id")
-        }
+        mAppDatabase.placeItemDao()
+                .getById(FIRST_PLACE.id)
+                .test()
+                .assertValue({
+                    it.name.equals(FIRST_PLACE.name) &&
+                            it.latitude == FIRST_PLACE.latitude &&
+                            it.longitude == FIRST_PLACE.longitude &&
+                            it.isStarred == FIRST_PLACE.isStarred
+                })
     }
 
     @Test
     fun addPlaces_retrieveAllPlace() {
-        // Given 2 new places in repository
-        val firstPlace = PlaceItem("First House", 13.7372904, 100.5380263, 1, true)
-        val secondPlace = PlaceItem("Second House", 10.7372904, 100.5380263, 1, false)
-
-        // When save 2 place into repository
-        mDataSource.addPlace(firstPlace)
-        mDataSource.addPlace(secondPlace)
+        // Given 2 new places & When these places into repository
+        mAppDatabase.placeItemDao().addPlace(FIRST_PLACE)
+        mAppDatabase.placeItemDao().addPlace(SECOND_PLACE)
 
         // Then both 2 places can be retrieved from repository
-        val places = mDataSource.getAllPlaces()
-        if (places != null && places.isNotEmpty()) {
-            // Assert first place
-            places[0].let {
-                assertEquals("First House", it.name)
-                assertEquals(13.7372904, it.latitude, 0.001)
-                assertEquals(100.5380263, it.longitude, 0.001)
-                assertEquals(1, it.type)
-                assertTrue(it.isStarred)
-            }
-            // Assert second place
-            places[1].let {
-                assertEquals("Second House", it.name)
-                assertEquals(10.7372904, it.latitude, 0.001)
-                assertEquals(100.5380263, it.longitude, 0.001)
-                assertEquals(1, it.type)
-                assertFalse(it.isStarred)
-            }
-        } else {
-            fail("Cannot retrieve place from repository")
-        }
+        mAppDatabase.placeItemDao()
+                .getAllPlaces()
+                .test()
+                .assertValue({
+                    it.isNotEmpty() &&
+                            it[0].let {
+                                it.name.equals(FIRST_PLACE.name) &&
+                                        it.latitude == FIRST_PLACE.latitude &&
+                                        it.longitude == FIRST_PLACE.longitude &&
+                                        it.isStarred == FIRST_PLACE.isStarred
+                            } &&
+                            it[1].let {
+                                it.name.equals(SECOND_PLACE.name) &&
+                                        it.latitude == SECOND_PLACE.latitude &&
+                                        it.longitude == SECOND_PLACE.longitude &&
+                                        it.isStarred == SECOND_PLACE.isStarred
+                            }
+                })
     }
 
     @Test
     fun updatePlace_retrievePlace() {
-        // Given a new place
-        val place = PlaceItem("House", 13.7372904, 100.5380263, 1, false)
-
-        // When save it into repository
-        mDataSource.addPlace(place)
+        // Given a new place & When save it into repository
+        mAppDatabase.placeItemDao().addPlace(FIRST_PLACE)
 
         // And edit place information and update to repository
-        val editedPlace = PlaceItem("Hospital", 13.7308651, 100.5268335, 2, true, place.id)
-        mDataSource.updatePlace(editedPlace)
+        val editedPlace = PlaceItem(THIRD_PLACE.name,
+                THIRD_PLACE.latitude,
+                THIRD_PLACE.longitude,
+                THIRD_PLACE.type,
+                THIRD_PLACE.isStarred,
+                FIRST_PLACE.id)
+        mAppDatabase.placeItemDao().updatePlace(editedPlace)
 
         // Then the place can be retrieved from repository
-        val savedPlace = mDataSource.getById(place.id)
-
-        // And the place information retrieved from repository must be equals to edited information
-        if (savedPlace != null) {
-            assertEquals("Hospital", savedPlace.name)
-            assertEquals(13.7308651, savedPlace.latitude, 0.001)
-            assertEquals(100.5268335, savedPlace.longitude, 0.001)
-            assertTrue(savedPlace.isStarred)
-        } else {
-            fail("Cannot retrieve place from given id")
-        }
+        mAppDatabase.placeItemDao()
+                .getById(FIRST_PLACE.id)
+                .test()
+                .assertValue({
+                    it.name.equals(THIRD_PLACE.name) &&
+                            it.latitude == THIRD_PLACE.latitude &&
+                            it.longitude == THIRD_PLACE.longitude &&
+                            it.type == THIRD_PLACE.type &&
+                            it.isStarred == THIRD_PLACE.isStarred &&
+                            it.id == FIRST_PLACE.id
+                })
     }
 
     @Test
     fun deletePlace_retrievePlace() {
         // Given a new place in repository
-        val place = PlaceItem("House", 13.7372904, 100.5380263, 1, false)
-        mDataSource.addPlace(place)
+        mAppDatabase.placeItemDao().addPlace(FIRST_PLACE)
 
         // When remove place from repository
-        mDataSource.deletePlace(place)
+        mAppDatabase.placeItemDao().deletePlace(FIRST_PLACE)
 
         // Then the place must not be retrieve from repository
-        val savedPlace = mDataSource.getById(place.id)
-        assertNull(savedPlace)
+        mAppDatabase.placeItemDao()
+                .getById(FIRST_PLACE.id)
+                .test()
+                .assertNoValues()
     }
 
     @Test
     fun clearPlace_retrievePlacesIsNull() {
         // Given 2 new place in repository
-        val firstPlace = PlaceItem("First House", 13.7372904, 100.5380263, 1, false)
-        mDataSource.addPlace(firstPlace)
-
-        val secondPlace = PlaceItem("Second House", 10.7372904, 100.5380263, 1, false)
-        mDataSource.addPlace(secondPlace)
+        mAppDatabase.placeItemDao().addPlace(FIRST_PLACE)
+        mAppDatabase.placeItemDao().addPlace(SECOND_PLACE)
 
         // When remove all place from repository
-        mDataSource.clearPlace()
+        mAppDatabase.placeItemDao().clearPlaces()
 
         // Then the place must not be retrieve from repository
-        val allPlaces = mDataSource.getAllPlaces()
-        assertTrue(allPlaces == null || allPlaces.isEmpty())
+        mAppDatabase.placeItemDao()
+                .getAllPlaces()
+                .test()
+                .assertValue({
+                    it.isEmpty()
+                })
+    }
+
+    companion object {
+        private val FIRST_PLACE = PlaceItem("CHULA",
+                13.741734,
+                100.516680,
+                1,
+                false)
+        private val SECOND_PLACE = PlaceItem("MBK",
+                13.743490,
+                100.530778,
+                2,
+                false)
+        private val THIRD_PLACE = PlaceItem("Dice Cup Board Game Cafe",
+                13.743240,
+                100.527709,
+                4,
+                true)
     }
 }
