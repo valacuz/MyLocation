@@ -10,8 +10,6 @@ import io.reactivex.Flowable
 @Dao
 interface PlaceDao : PlaceDataSource {
 
-    // TODO: Try using Maybe for queries.
-
     @Query("SELECT * FROM tbl_place")
     override fun getAllPlaces(): Flowable<List<PlaceItem>>
 

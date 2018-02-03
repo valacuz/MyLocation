@@ -10,21 +10,19 @@ import com.example.valacuz.mylocations.data.PlaceItem
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-class PlaceListViewModel(itemDataSource: PlaceDataSource) : BaseObservable() {
+class PlaceListViewModel(private val itemDataSource: PlaceDataSource) : BaseObservable() {
 
     // Bindable values
     val items: ObservableList<PlaceItem> = ObservableArrayList()
 
-    private val mItemDataSource: PlaceDataSource = itemDataSource
-
-    private var mNavigator: PlaceNavigator? = null
+    private var navigator: PlaceNavigator? = null
 
     fun setNavigator(navigator: PlaceNavigator) {
-        mNavigator = navigator
+        this.navigator = navigator
     }
 
     // Called by the data binding library and button click listener.
-    fun addNewTask() = mNavigator?.addLocation()
+    fun addNewTask() = navigator?.addLocation()
 
     @Bindable
     fun isEmpty(): Boolean = items.isEmpty()
@@ -34,17 +32,17 @@ class PlaceListViewModel(itemDataSource: PlaceDataSource) : BaseObservable() {
     }
 
     fun onActivityDestroyed() {
-        mNavigator = null   // Remove navigator references to avoid leaks.
+        navigator = null   // Remove navigator references to avoid leaks.
     }
 
     fun onDeletePlaceClick(place: PlaceItem) {
-        mItemDataSource.deletePlace(place)
+        itemDataSource.deletePlace(place)
         items.remove(place)
         notifyPropertyChanged(BR.empty) // Update @Bindable
     }
 
     fun loadItems() {
-        mItemDataSource.getAllPlaces()
+        itemDataSource.getAllPlaces()
                 .observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe({ places ->

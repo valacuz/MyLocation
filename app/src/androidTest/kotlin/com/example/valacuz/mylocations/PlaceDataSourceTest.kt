@@ -19,11 +19,11 @@ class PlaceDataSourceTest {
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var mAppDatabase: AppDatabase
+    private lateinit var appDatabase: AppDatabase
 
     @Before
     fun setup() {
-        mAppDatabase = Room
+        appDatabase = Room
                 .inMemoryDatabaseBuilder(InstrumentationRegistry.getTargetContext(), AppDatabase::class.java)
                 .allowMainThreadQueries()   // Allow main thread queries, just for testing
                 .build()
@@ -31,17 +31,17 @@ class PlaceDataSourceTest {
 
     @After
     fun cleanup() {
-        mAppDatabase.placeItemDao().clearPlaces()
-        mAppDatabase.close()
+        appDatabase.placeItemDao().clearPlaces()
+        appDatabase.close()
     }
 
     @Test
     fun addPlace_retrievePlace() {
         // Given a new place & When save it into repository
-        mAppDatabase.placeItemDao().addPlace(FIRST_PLACE)
+        appDatabase.placeItemDao().addPlace(FIRST_PLACE)
 
         // Then the place can be retrieved from repository
-        mAppDatabase.placeItemDao()
+        appDatabase.placeItemDao()
                 .getById(FIRST_PLACE.id)
                 .test()
                 .assertValue({
@@ -55,11 +55,11 @@ class PlaceDataSourceTest {
     @Test
     fun addPlaces_retrieveAllPlace() {
         // Given 2 new places & When these places into repository
-        mAppDatabase.placeItemDao().addPlace(FIRST_PLACE)
-        mAppDatabase.placeItemDao().addPlace(SECOND_PLACE)
+        appDatabase.placeItemDao().addPlace(FIRST_PLACE)
+        appDatabase.placeItemDao().addPlace(SECOND_PLACE)
 
         // Then both 2 places can be retrieved from repository
-        mAppDatabase.placeItemDao()
+        appDatabase.placeItemDao()
                 .getAllPlaces()
                 .test()
                 .assertValue({
@@ -82,7 +82,7 @@ class PlaceDataSourceTest {
     @Test
     fun updatePlace_retrievePlace() {
         // Given a new place & When save it into repository
-        mAppDatabase.placeItemDao().addPlace(FIRST_PLACE)
+        appDatabase.placeItemDao().addPlace(FIRST_PLACE)
 
         // And edit place information and update to repository
         val editedPlace = PlaceItem(THIRD_PLACE.name,
@@ -91,10 +91,10 @@ class PlaceDataSourceTest {
                 THIRD_PLACE.type,
                 THIRD_PLACE.isStarred,
                 FIRST_PLACE.id)
-        mAppDatabase.placeItemDao().updatePlace(editedPlace)
+        appDatabase.placeItemDao().updatePlace(editedPlace)
 
         // Then the place can be retrieved from repository
-        mAppDatabase.placeItemDao()
+        appDatabase.placeItemDao()
                 .getById(FIRST_PLACE.id)
                 .test()
                 .assertValue({
@@ -110,13 +110,13 @@ class PlaceDataSourceTest {
     @Test
     fun deletePlace_retrievePlace() {
         // Given a new place in repository
-        mAppDatabase.placeItemDao().addPlace(FIRST_PLACE)
+        appDatabase.placeItemDao().addPlace(FIRST_PLACE)
 
         // When remove place from repository
-        mAppDatabase.placeItemDao().deletePlace(FIRST_PLACE)
+        appDatabase.placeItemDao().deletePlace(FIRST_PLACE)
 
         // Then the place must not be retrieve from repository
-        mAppDatabase.placeItemDao()
+        appDatabase.placeItemDao()
                 .getById(FIRST_PLACE.id)
                 .test()
                 .assertNoValues()
@@ -125,14 +125,14 @@ class PlaceDataSourceTest {
     @Test
     fun clearPlace_retrievePlacesIsNull() {
         // Given 2 new place in repository
-        mAppDatabase.placeItemDao().addPlace(FIRST_PLACE)
-        mAppDatabase.placeItemDao().addPlace(SECOND_PLACE)
+        appDatabase.placeItemDao().addPlace(FIRST_PLACE)
+        appDatabase.placeItemDao().addPlace(SECOND_PLACE)
 
         // When remove all place from repository
-        mAppDatabase.placeItemDao().clearPlaces()
+        appDatabase.placeItemDao().clearPlaces()
 
         // Then the place must not be retrieve from repository
-        mAppDatabase.placeItemDao()
+        appDatabase.placeItemDao()
                 .getAllPlaces()
                 .test()
                 .assertValue({
@@ -140,21 +140,19 @@ class PlaceDataSourceTest {
                 })
     }
 
-    companion object {
-        private val FIRST_PLACE = PlaceItem("CHULA",
-                13.741734,
-                100.516680,
-                1,
-                false)
-        private val SECOND_PLACE = PlaceItem("MBK",
-                13.743490,
-                100.530778,
-                2,
-                false)
-        private val THIRD_PLACE = PlaceItem("Dice Cup Board Game Cafe",
-                13.743240,
-                100.527709,
-                4,
-                true)
-    }
+    private const val FIRST_PLACE = PlaceItem("CHULA",
+            13.741734,
+            100.516680,
+            1,
+            false)
+    private const val SECOND_PLACE = PlaceItem("MBK",
+            13.743490,
+            100.530778,
+            2,
+            false)
+    private const val THIRD_PLACE = PlaceItem("Dice Cup Board Game Cafe",
+            13.743240,
+            100.527709,
+            4,
+            true)
 }

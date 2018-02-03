@@ -9,40 +9,40 @@ import com.example.valacuz.mylocations.databinding.PlaceItemBinding
 class PlaceAdapter :
         RecyclerView.Adapter<PlaceAdapter.LocationViewHolder>() {
 
-    private var mItems: MutableList<PlaceItem> = mutableListOf()
+    private var items: MutableList<PlaceItem> = mutableListOf()
 
-    private var mItemNavigator: PlaceItemNavigator? = null
+    private var itemNavigator: PlaceItemNavigator? = null
 
-    override fun getItemCount(): Int = mItems.size
+    override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: LocationViewHolder, position: Int) {
-        val item: PlaceItem = mItems[position]
+        val item: PlaceItem = items[position]
         holder.bindViewModel(item)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): LocationViewHolder {
         val binding = PlaceItemBinding.inflate(
                 LayoutInflater.from(parent!!.context), parent, false)
-        return LocationViewHolder(binding, mItemNavigator)
+        return LocationViewHolder(binding, itemNavigator)
     }
 
     fun replaceItems(newItems: List<PlaceItem>) {
-        mItems.clear()
-        mItems.addAll(newItems)
+        items.clear()
+        items.addAll(newItems)
         notifyDataSetChanged()
     }
 
     fun removeItem(item: PlaceItem) {
-        val itemIndex: Int = mItems.indexOfFirst { it.id == item.id }
+        val itemIndex: Int = items.indexOfFirst { it.id == item.id }
         if (itemIndex >= 0) {
-            mItems.removeAt(itemIndex)
+            items.removeAt(itemIndex)
             notifyItemRemoved(itemIndex)
             notifyDataSetChanged()
         }
     }
 
     fun setItemNavigator(itemNavigator: PlaceItemNavigator?) {
-        mItemNavigator = itemNavigator
+        this.itemNavigator = itemNavigator
     }
 
     class LocationViewHolder(binding: PlaceItemBinding, itemNavigator: PlaceItemNavigator?) :

@@ -5,7 +5,7 @@ import android.content.Intent
 
 class GoogleMapShareContentSource(context: Context) : ShareContentSource {
 
-    private val mContext: Context = context.applicationContext
+    private val context: Context = context.applicationContext
 
     override fun shareContent(name: String, latitude: Double, longitude: Double) {
         val url = "http://maps.google.com/maps?saddr=$latitude,$longitude"
@@ -13,6 +13,6 @@ class GoogleMapShareContentSource(context: Context) : ShareContentSource {
                 .setType("text/plain")
                 .putExtra(Intent.EXTRA_SUBJECT, name)
                 .putExtra(Intent.EXTRA_TEXT, url)
-        mContext.startActivity(Intent.createChooser(intent, "Share via"))
+        context.startActivity(Intent.createChooser(intent, "Share via"))
     }
 }

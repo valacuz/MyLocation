@@ -53,8 +53,13 @@ class MemoryPlaceDataSource private constructor() : PlaceDataSource {
     }
 
     companion object {
-        val INSTANCE: MemoryPlaceDataSource by lazy {
-            MemoryPlaceDataSource()
-        }
+
+        @Volatile
+        private var INSTANCE: MemoryPlaceDataSource? = null
+
+        fun getInstance(): MemoryPlaceDataSource =
+                INSTANCE ?: synchronized(this) {
+                    INSTANCE ?: MemoryPlaceDataSource().also { INSTANCE = it }
+                }
     }
 }

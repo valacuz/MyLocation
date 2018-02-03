@@ -11,41 +11,41 @@ import com.example.valacuz.mylocations.databinding.FragmentPlaceListBinding
 
 class PlaceListFragment : Fragment() {
 
-    private lateinit var mViewModel: PlaceListViewModel
+    private lateinit var viewModel: PlaceListViewModel
 
-    private lateinit var mFragmentBinding: FragmentPlaceListBinding
+    private lateinit var fragmentBinding: FragmentPlaceListBinding
 
-    private lateinit var mPlaceAdapter: PlaceAdapter
+    private lateinit var placeAdapter: PlaceAdapter
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        mFragmentBinding = FragmentPlaceListBinding.inflate(inflater, container, false)
-        mFragmentBinding.viewModel = mViewModel
-        return mFragmentBinding.root
+        fragmentBinding = FragmentPlaceListBinding.inflate(inflater, container, false)
+        fragmentBinding.viewModel = viewModel
+        return fragmentBinding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         // Create location adapter with empty item (so it easier to use later)
-        mPlaceAdapter = PlaceAdapter()
+        placeAdapter = PlaceAdapter()
         // Set item navigator
         if (activity is PlaceItemNavigator) {
-            mPlaceAdapter.setItemNavigator(activity as PlaceItemNavigator)
+            placeAdapter.setItemNavigator(activity as PlaceItemNavigator)
         }
         // Set recyclerView
-        mFragmentBinding.locationList.apply {
+        fragmentBinding.locationList.apply {
             addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
             layoutManager = LinearLayoutManager(activity)
-            adapter = mPlaceAdapter
+            adapter = placeAdapter
         }
         // Start view model
-        mViewModel.start()
+        viewModel.start()
     }
 
     fun setViewModel(viewModel: PlaceListViewModel) {
-        mViewModel = viewModel
+        this.viewModel = viewModel
     }
 
     companion object {

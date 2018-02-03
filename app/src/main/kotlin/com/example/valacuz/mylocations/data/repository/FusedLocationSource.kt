@@ -12,36 +12,36 @@ import io.reactivex.subjects.PublishSubject
 
 class FusedLocationSource private constructor(context: Context) : LocationProviderSource {
 
-    private var mLocationCallback = object : LocationCallback() {
+    private var locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
-            mPublishSubject.onNext(locationResult!!.lastLocation)
+            publishSubject.onNext(locationResult!!.lastLocation)
         }
     }
 
-    private var mLocationClient: FusedLocationProviderClient = LocationServices
+    private var locationClient: FusedLocationProviderClient = LocationServices
             .getFusedLocationProviderClient(context)
 
-    private var mLocationRequest: LocationRequest = LocationRequest.create()
+    private var locationRequest: LocationRequest = LocationRequest.create()
             .setInterval(5000)
             .setFastestInterval(2500)
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
 
-    private var mPublishSubject: PublishSubject<Location> = PublishSubject.create()
+    private var publishSubject: PublishSubject<Location> = PublishSubject.create()
 
-    override fun getObservableLocation(): Observable<Location> = mPublishSubject
+    override fun getObservableLocation(): Observable<Location> = publishSubject
 
     override fun startUpdates() {
-        val isPermissionGranted = ContextCompat.checkSelfPermission(mLocationClient.applicationContext,
+        val isPermissionGranted = ContextCompat.checkSelfPermission(locationClient.applicationContext,
                 android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
         if (isPermissionGranted) {
-            mLocationClient.requestLocationUpdates(
-                    mLocationRequest, mLocationCallback, Looper.myLooper())
+            locationClient.requestLocationUpdates(
+                    locationRequest, locationCallback, Looper.myLooper())
         }
     }
 
     override fun stopUpdates() {
-        mLocationClient.removeLocationUpdates(mLocationCallback)
+        locationClient.removeLocationUpdates(locationCallback)
     }
 
     companion object {

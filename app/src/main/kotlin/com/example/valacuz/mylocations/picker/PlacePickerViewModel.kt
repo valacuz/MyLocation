@@ -16,59 +16,59 @@ class PlacePickerViewModel(locationSource: LocationProviderSource) : BaseObserva
 
     val zoomLevel: ObservableFloat = ObservableFloat(16F)
 
-    private var mNavigator: PlacePickerNavigator? = null
+    private var navigator: PlacePickerNavigator? = null
 
-    private var mCompositeDisposable = CompositeDisposable()
+    private var compositeDisposable = CompositeDisposable()
 
-    private var mHasZoomToLocation: Boolean = false
+    private var hasZoomToLocation: Boolean = false
 
-    private var mCurrentLatitude: Double = 0.0
+    private var currentLatitude: Double = 0.0
 
-    private var mCurrentLongitude: Double = 0.0
+    private var currentLongitude: Double = 0.0
 
-    private var mLocationSource = locationSource
+    private var locationSource = locationSource
 
     fun setNavigator(navigator: PlacePickerNavigator) {
-        mNavigator = navigator
+        this.navigator = navigator
     }
 
     fun setCenterLocation(latitude: Double, longitude: Double) {
         centerLatLng.set(LatLng(latitude, longitude))
         centerLatLng.notifyChange()
         // Trigger zoom to location flag to disable default location zoom
-        mHasZoomToLocation = true
+        hasZoomToLocation = true
     }
 
     // Called by the data binding library when current location button clicked.
     fun moveToCurrentLocation() {
-        setCenterLocation(mCurrentLatitude, mCurrentLongitude)
+        setCenterLocation(currentLatitude, currentLongitude)
     }
 
     // Called by the view (PlacePickerFragment) when pick location button clicked.
     fun pickLocation(latitude: Double, longitude: Double) {
-        mNavigator?.goBackToForm(latitude, longitude)
+        navigator?.goBackToForm(latitude, longitude)
     }
 
     fun create() {
-        mLocationSource.startUpdates()
-        val disposable = mLocationSource
+        locationSource.startUpdates()
+        val disposable = locationSource
                 .getObservableLocation()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe { location ->
-                    mCurrentLatitude = location.latitude
-                    mCurrentLongitude = location.longitude
+                    currentLatitude = location.latitude
+                    currentLongitude = location.longitude
                     // For first time when location found, center at that location.
-                    if (!mHasZoomToLocation) {
+                    if (!hasZoomToLocation) {
                         moveToCurrentLocation()
                     }
                 }
-        mCompositeDisposable.add(disposable)
+        compositeDisposable.add(disposable)
     }
 
     fun onActivityDestroyed() {
-        mLocationSource.stopUpdates()
-        mCompositeDisposable.clear()
-        mNavigator = null   // Remove navigator references to avoid leaks
+        locationSource.stopUpdates()
+        compositeDisposable.clear()
+        navigator = null   // Remove navigator references to avoid leaks
     }
 }

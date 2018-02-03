@@ -19,7 +19,6 @@ import com.example.valacuz.mylocations.picker.PlacePickerActivity
 class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
 
     private val VIEW_MODEL_TAG = "FORM_VM_TAG"
-
     private val REQUEST_PICK_LOCATION = 1001
 
     private lateinit var mViewModel: PlaceFormViewModel
@@ -110,7 +109,7 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
             // If the ViewModel was retained, return it.
             holder.getViewModel()!!
         } else {
-            val itemDataSource: PlaceDataSource = MemoryPlaceDataSource.INSTANCE
+            val itemDataSource: PlaceDataSource = MemoryPlaceDataSource.getInstance()
             val viewModel = PlaceFormViewModel(this, itemDataSource, mPlaceId)
             supportFragmentManager
                     .beginTransaction()
