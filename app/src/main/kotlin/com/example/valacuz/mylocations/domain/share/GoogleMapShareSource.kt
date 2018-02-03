@@ -1,9 +1,9 @@
-package com.example.valacuz.mylocations.util
+package com.example.valacuz.mylocations.domain.share
 
 import android.content.Context
 import android.content.Intent
 
-class GoogleMapShareContentSource(context: Context) : ShareContentSource {
+class GoogleMapShareSource(context: Context) : ShareContentSource {
 
     private val context: Context = context.applicationContext
 

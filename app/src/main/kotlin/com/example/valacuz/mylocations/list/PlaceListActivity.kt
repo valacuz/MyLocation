@@ -14,7 +14,10 @@ import com.example.valacuz.mylocations.data.PlaceDataSource
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.MemoryPlaceDataSource
 import com.example.valacuz.mylocations.form.PlaceFormActivity
-import com.example.valacuz.mylocations.util.*
+import com.example.valacuz.mylocations.domain.display.GoogleMapDisplaySource
+import com.example.valacuz.mylocations.domain.display.MapDisplaySource
+import com.example.valacuz.mylocations.domain.share.GoogleMapShareSource
+import com.example.valacuz.mylocations.domain.share.ShareContentSource
 
 class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigator {
 
@@ -38,7 +41,7 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
         viewModel.setNavigator(this)
 
         mapDisplaySource = GoogleMapDisplaySource(this)
-        shareContentSource = GoogleMapShareContentSource(this)
+        shareContentSource = GoogleMapShareSource(this)
 
         val fragment: PlaceListFragment = findOrCreateFragment()
         fragment.setViewModel(viewModel)

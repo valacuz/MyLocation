@@ -1,4 +1,4 @@
-package com.example.valacuz.mylocations.util
+package com.example.valacuz.mylocations.domain.display
 
 import android.content.Context
 import android.content.Intent

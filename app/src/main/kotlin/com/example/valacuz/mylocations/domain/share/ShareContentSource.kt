@@ -1,4 +1,4 @@
-package com.example.valacuz.mylocations.util
+package com.example.valacuz.mylocations.domain.share
 
 interface ShareContentSource {
 
