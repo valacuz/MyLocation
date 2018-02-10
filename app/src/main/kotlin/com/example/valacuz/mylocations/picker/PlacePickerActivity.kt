@@ -14,28 +14,28 @@ class PlacePickerActivity : AppCompatActivity(), PlacePickerNavigator {
 
     private val VIEW_MODEL_TAG = "MAP_VM_TAG"
 
-    private lateinit var mViewModel: PlacePickerViewModel
+    private lateinit var viewModel: PlacePickerViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_place_picker)
         setupToolbar()
 
-        mViewModel = findOrCreateViewModel()
-        mViewModel.setNavigator(this)
+        viewModel = findOrCreateViewModel()
+        viewModel.setNavigator(this)
 
         val fragment: PlacePickerFragment = findOrCreateFragment()
-        fragment.setViewModel(mViewModel)
+        fragment.setViewModel(viewModel)
 
         intent?.extras?.let {
-            mViewModel.setCenterLocation(
+            viewModel.setCenterLocation(
                     latitude = it.getDouble("LATITUDE", 0.0),
                     longitude = it.getDouble("LONGITUDE", 0.0))
         }
     }
 
     override fun onDestroy() {
-        mViewModel.onActivityDestroyed()
+        viewModel.onActivityDestroyed()
         super.onDestroy()
     }
 

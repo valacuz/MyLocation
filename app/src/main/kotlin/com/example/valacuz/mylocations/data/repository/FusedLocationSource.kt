@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Looper
 import android.support.v4.content.ContextCompat
-import com.example.valacuz.mylocations.SingletonHolder
 import com.example.valacuz.mylocations.data.LocationProviderSource
 import com.google.android.gms.location.*
 import io.reactivex.Observable
@@ -13,41 +12,46 @@ import io.reactivex.subjects.PublishSubject
 
 class FusedLocationSource private constructor(context: Context) : LocationProviderSource {
 
-    private var mContext: Context = context.applicationContext
-
-    private var mLocationCallback = object : LocationCallback() {
+    private var locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
-            mPublishSubject.onNext(locationResult!!.lastLocation)
+            publishSubject.onNext(locationResult!!.lastLocation)
         }
     }
 
-    private var mLocationClient: FusedLocationProviderClient = LocationServices
-            .getFusedLocationProviderClient(mContext)
+    private var locationClient: FusedLocationProviderClient = LocationServices
+            .getFusedLocationProviderClient(context)
 
-    private var mLocationRequest: LocationRequest = LocationRequest.create()
+    private var locationRequest: LocationRequest = LocationRequest.create()
             .setInterval(5000)
             .setFastestInterval(2500)
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
 
-    private var mPublishSubject: PublishSubject<Location> = PublishSubject.create()
+    private var publishSubject: PublishSubject<Location> = PublishSubject.create()
 
-    override fun getObservableLocation(): Observable<Location> = mPublishSubject
+    override fun getObservableLocation(): Observable<Location> = publishSubject
 
     override fun startUpdates() {
-        val isPermissionGranted = ContextCompat.checkSelfPermission(
-                mContext, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val isPermissionGranted = ContextCompat.checkSelfPermission(locationClient.applicationContext,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
         if (isPermissionGranted) {
-            mLocationClient.requestLocationUpdates(
-                    mLocationRequest, mLocationCallback, Looper.myLooper())
+            locationClient.requestLocationUpdates(
+                    locationRequest, locationCallback, Looper.myLooper())
         }
     }
 
     override fun stopUpdates() {
-        mLocationClient.removeLocationUpdates(mLocationCallback)
+        locationClient.removeLocationUpdates(locationCallback)
     }
 
-    // Pass a reference to the private constructor of the singleton class.
-    // In this case use constructor as function reference (which contains Context)
-    companion object : SingletonHolder<FusedLocationSource, Context>(::FusedLocationSource)
+    companion object {
+
+        @Volatile
+        private var INSTANCE: FusedLocationSource? = null
+
+        fun getInstance(context: Context): FusedLocationSource =
+                INSTANCE ?: synchronized(this) {
+                    INSTANCE ?: FusedLocationSource(context.applicationContext)
+                }
+    }
 }

@@ -3,6 +3,9 @@ package com.example.valacuz.mylocations.list
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.VisibleForTesting
+import android.support.test.espresso.IdlingResource
+import android.support.test.espresso.idling.CountingIdlingResource
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import com.example.valacuz.mylocations.R
@@ -11,34 +14,37 @@ import com.example.valacuz.mylocations.data.PlaceDataSource
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.MemoryPlaceDataSource
 import com.example.valacuz.mylocations.form.PlaceFormActivity
-import com.example.valacuz.mylocations.util.*
+import com.example.valacuz.mylocations.domain.display.GoogleMapDisplaySource
+import com.example.valacuz.mylocations.domain.display.MapDisplaySource
+import com.example.valacuz.mylocations.domain.share.GoogleMapShareSource
+import com.example.valacuz.mylocations.domain.share.ShareContentSource
 
 class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigator {
 
     private val VIEW_MODEL_TAG = "LIST_VM_TAG"
-    private val REQUEST_FORM = 1001
+    private val REQUEST_FORM = 2001
 
-    private lateinit var mViewModel: PlaceListViewModel
+    private lateinit var viewModel: PlaceListViewModel
 
     // Long click menu action sources
-    private lateinit var mMapDisplaySource: MapDisplaySource
-    private lateinit var mShareContentSource: ShareContentSource
+    private lateinit var mapDisplaySource: MapDisplaySource
+    private lateinit var shareContentSource: ShareContentSource
 
-    private var mChoiceDialog: PlaceActionDialog? = null
+    private var choiceDialog: PlaceActionDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_place_list)
         setupToolbar()
 
-        mViewModel = findOrCreateViewModel()
-        mViewModel.setNavigator(this)
+        viewModel = findOrCreateViewModel()
+        viewModel.setNavigator(this)
 
-        mMapDisplaySource = GoogleMapDisplaySource(this)
-        mShareContentSource = GoogleMapShareContentSource(this)
+        mapDisplaySource = GoogleMapDisplaySource(this)
+        shareContentSource = GoogleMapShareSource(this)
 
         val fragment: PlaceListFragment = findOrCreateFragment()
-        fragment.setViewModel(mViewModel)
+        fragment.setViewModel(viewModel)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -46,14 +52,14 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQUEST_FORM -> {
-                    mViewModel.loadItems()  // Refresh items
+                    viewModel.loadItems()  // Refresh items
                 }
             }
         }
     }
 
     override fun onDestroy() {
-        mViewModel.onActivityDestroyed()
+        viewModel.onActivityDestroyed()
         super.onDestroy()
     }
 
@@ -69,23 +75,23 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
     }
 
     override fun displayItemAction(place: PlaceItem) {
-        if (mChoiceDialog == null) {
-            mChoiceDialog = PlaceActionDialog.getInstance(place)
+        if (choiceDialog == null) {
+            choiceDialog = PlaceActionDialog.getInstance(place)
                     .setListener(object : PlaceActionDialog.Listener {
                         override fun onShowOnMapClick(place: PlaceItem) {
-                            mMapDisplaySource.displayOnMap(place.latitude, place.longitude)
+                            mapDisplaySource.displayOnMap(place.latitude, place.longitude)
                         }
 
                         override fun onShareClick(place: PlaceItem) {
-                            mShareContentSource.shareContent(place.name, place.latitude, place.longitude)
+                            shareContentSource.shareContent(place.name!!, place.latitude, place.longitude)
                         }
 
                         override fun onDeleteClick(place: PlaceItem) {
-                            mViewModel.onDeletePlaceClick(place)
+                            viewModel.onDeletePlaceClick(place)
                         }
                     })
         }
-        mChoiceDialog!!.show(supportFragmentManager, PlaceActionDialog::class.java.name)
+        choiceDialog!!.show(supportFragmentManager, PlaceActionDialog::class.java.name)
     }
 
     private fun setupToolbar() {
@@ -106,7 +112,7 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
             holder.getViewModel()!!
         } else {
             // If there no ViewModel yet, create it.
-            val itemDataSource: PlaceDataSource = MemoryPlaceDataSource.INSTANCE
+            val itemDataSource: PlaceDataSource = MemoryPlaceDataSource.getInstance()
             val viewModel = PlaceListViewModel(itemDataSource)
             supportFragmentManager
                     .beginTransaction()
@@ -129,5 +135,10 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
                     .commit()
         }
         return fragment
+    }
+
+    @VisibleForTesting
+    fun getCountingIdlingResource(): IdlingResource {
+        return CountingIdlingResource(PlaceListActivity::class.java.name)
     }
 }

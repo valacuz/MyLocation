@@ -15,41 +15,41 @@ import com.google.android.gms.maps.GoogleMap
 
 class PlacePickerFragment : Fragment() {
 
-    private val LOCATION_REQUEST_CODE: Int = 10001
+    private val LOCATION_REQUEST_CODE: Int = 3001
 
-    private lateinit var mViewModel: PlacePickerViewModel
-    private lateinit var mFragmentBinding: FragmentPlacePickerBinding
+    private lateinit var viewModel: PlacePickerViewModel
+    private lateinit var fragmentBinding: FragmentPlacePickerBinding
 
-    private lateinit var mGoogleMap: GoogleMap
+    private lateinit var googleMap: GoogleMap
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        mFragmentBinding = FragmentPlacePickerBinding.inflate(inflater, container, false)
-        mFragmentBinding.viewModel = mViewModel
-        return mFragmentBinding.root
+        fragmentBinding = FragmentPlacePickerBinding.inflate(inflater, container, false)
+        fragmentBinding.viewModel = viewModel
+        return fragmentBinding.root
     }
 
     @SuppressLint("MissingPermission")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         //
-        mViewModel.create()
+        viewModel.create()
         //
-        mFragmentBinding.mapView.onCreate(savedInstanceState)
-        mFragmentBinding.mapView.getMapAsync {
-            mGoogleMap = it
+        fragmentBinding.mapView.onCreate(savedInstanceState)
+        fragmentBinding.mapView.getMapAsync {
+            googleMap = it
             // If device location granted, display current location on map.
             if (isLocationPermissionGranted()) {
-                mGoogleMap.isMyLocationEnabled = true
-                mGoogleMap.uiSettings.isMyLocationButtonEnabled = false
+                googleMap.isMyLocationEnabled = true
+                googleMap.uiSettings.isMyLocationButtonEnabled = false
             }
         }
         // Add event listener for pick button
-        mFragmentBinding.pickButton.setOnClickListener { _ ->
-            val target = mGoogleMap.cameraPosition.target
-            mViewModel.pickLocation(target.latitude, target.longitude)
+        fragmentBinding.pickButton.setOnClickListener { _ ->
+            val target = googleMap.cameraPosition.target
+            viewModel.pickLocation(target.latitude, target.longitude)
         }
         // Request location permission.
         if (!isLocationPermissionGranted()) {
@@ -59,27 +59,27 @@ class PlacePickerFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        mFragmentBinding.mapView.onStart()
+        fragmentBinding.mapView.onStart()
     }
 
     override fun onResume() {
         super.onResume()
-        mFragmentBinding.mapView.onResume()
+        fragmentBinding.mapView.onResume()
     }
 
     override fun onPause() {
-        mFragmentBinding.mapView.onPause()
+        fragmentBinding.mapView.onPause()
         super.onPause()
     }
 
     override fun onStop() {
-        mFragmentBinding.mapView.onStop()
+        fragmentBinding.mapView.onStop()
         super.onStop()
     }
 
     override fun onDestroy() {
-        mFragmentBinding.mapView.onDestroy()
-        mViewModel.onActivityDestroyed()
+        fragmentBinding.mapView.onDestroy()
+        viewModel.onActivityDestroyed()
         super.onDestroy()
     }
 
@@ -96,7 +96,7 @@ class PlacePickerFragment : Fragment() {
     }
 
     fun setViewModel(viewModel: PlacePickerViewModel) {
-        mViewModel = viewModel
+        this.viewModel = viewModel
     }
 
     private fun isLocationPermissionGranted(): Boolean {

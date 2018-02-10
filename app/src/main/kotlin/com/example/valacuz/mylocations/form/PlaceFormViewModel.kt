@@ -1,48 +1,59 @@
 package com.example.valacuz.mylocations.form
 
+import android.content.Context
 import android.databinding.*
+import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.data.PlaceDataSource
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.PlaceType
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
-class PlaceFormViewModel(itemDataSource: PlaceDataSource, id: String? = null) : BaseObservable() {
+class PlaceFormViewModel(context: Context,
+                         private val itemDataSource: PlaceDataSource,
+                         id: String? = null)
+    : BaseObservable() {
 
     // Binding fields.
     val name: ObservableField<String> = ObservableField()
 
-    val latitude: ObservableDouble = ObservableDouble()
+    val latitude: ObservableDouble = ObservableDouble(0.0)
 
-    val longitude: ObservableDouble = ObservableDouble()
-
-    val coordinateString: ObservableField<String> = ObservableField()
-
-    val placeTypes: ObservableList<PlaceType> = ObservableArrayList()
+    val longitude: ObservableDouble = ObservableDouble(0.0)
 
     val selectedType: ObservableField<PlaceType> = ObservableField()
 
     val starred: ObservableBoolean = ObservableBoolean(false)
 
+    // Used to display error messages
+    val errorMessage: ObservableField<String> = ObservableField()
+
+    // Used to display coordinate in format {lat}, {lon}
+    val coordinateString: ObservableField<String> = ObservableField()
+
+    // Used to binding with spinner for types of place
+    val placeTypes: ObservableList<PlaceType> = ObservableArrayList()
+
     //
+    private val context: Context = context.applicationContext  // Force application context to avoid leaks
 
-    private val mItemDataSource: PlaceDataSource = itemDataSource
+    private var navigator: PlaceFormNavigator? = null
 
-    private var mNavigator: PlaceFormNavigator? = null
-
-    private val mPlaceId: String? = id
+    private val placeId: String? = id
 
     fun setNavigator(navigator: PlaceFormNavigator) {
-        mNavigator = navigator
+        this.navigator = navigator
     }
 
     fun create() {
         // Retrieve list of place type.
         populatePlaceType()
         // Retrieve item from given id.
-        mPlaceId?.let { populateItem(it) }
+        placeId?.let { populateItem(it) }
     }
 
     fun onActivityDestroyed() {
-        mNavigator = null // Remove navigator references to avoid leaks.
+        navigator = null // Remove navigator references to avoid leaks.
     }
 
     fun saveButtonClick() {
@@ -51,12 +62,12 @@ class PlaceFormViewModel(itemDataSource: PlaceDataSource, id: String? = null) : 
                     latitude.get(), longitude.get(), starred.get())
         } else {
             updateLocation(name.get(), selectedType.get().id,
-                    latitude.get(), longitude.get(), starred.get(), mPlaceId!!)
+                    latitude.get(), longitude.get(), starred.get(), placeId!!)
         }
     }
 
     fun locationTextClick() {
-        mNavigator?.goPickLocation(latitude.get(), longitude.get())
+        navigator?.goPickLocation(latitude.get(), longitude.get())
     }
 
     fun setCoordinate(lat: Double, lon: Double) {
@@ -65,33 +76,39 @@ class PlaceFormViewModel(itemDataSource: PlaceDataSource, id: String? = null) : 
         coordinateString.set("%.6f, %.6f".format(latitude.get(), longitude.get()))
     }
 
-    private fun isNewLocation(): Boolean = mPlaceId == null
+    private fun isNewLocation(): Boolean = placeId == null
 
     private fun populatePlaceType() {
-        val allTypes = mItemDataSource.getAllTypes()
-        allTypes?.let {
-            placeTypes.addAll(it)
-        }
+        itemDataSource.getAllTypes()
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe({ types -> placeTypes.addAll(types) })
     }
 
     private fun populateItem(placeId: String) {
-        val placeItem = mItemDataSource.getById(placeId)
-        if (placeItem != null) {
-            name.set(placeItem.name)
-            starred.set(placeItem.isStarred)
-            setCoordinate(placeItem.latitude, placeItem.longitude)
-            selectedType.set(placeTypes.first { it.id == placeItem.type })
-        }
+        itemDataSource.getById(placeId)
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe({ placeItem ->
+                    name.set(placeItem.name)
+                    starred.set(placeItem.isStarred)
+                    setCoordinate(placeItem.latitude, placeItem.longitude)
+                    selectedType.set(placeTypes.first { it.id == placeItem.type })
+                })
     }
 
-    private fun addLocation(name: String,
+    private fun addLocation(name: String?,
                             type: Int,
                             latitude: Double,
                             longitude: Double,
                             isStarred: Boolean) {
         val place = PlaceItem(name, latitude, longitude, type, isStarred)
-        mItemDataSource.addPlace(place)
-        mNavigator?.goBackToList()
+        if (place.isEmpty()) {
+            errorMessage.set(context.getString(R.string.msg_empty_name))
+        } else {
+            itemDataSource.addPlace(place)
+            navigator?.goBackToList()
+        }
     }
 
     private fun updateLocation(name: String,
@@ -101,7 +118,7 @@ class PlaceFormViewModel(itemDataSource: PlaceDataSource, id: String? = null) : 
                                isStarred: Boolean,
                                id: String) {
         val place = PlaceItem(name, latitude, longitude, type, isStarred, id)
-        mItemDataSource.updatePlace(place)
-        mNavigator?.goBackToList()
+        itemDataSource.updatePlace(place)
+        navigator?.goBackToList()
     }
 }

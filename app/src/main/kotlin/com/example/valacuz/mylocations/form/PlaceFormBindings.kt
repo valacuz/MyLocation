@@ -18,12 +18,11 @@ object PlaceFormBindings {
                              bindingListener: InverseBindingListener,
                              type: PlaceType?,
                              items: List<PlaceType>?) {
-        if (items != null) {
+        if (items != null && items.isNotEmpty()) {
             // Create adapter when its null.
-            if (spinner.adapter == null) {
-                spinner.adapter = ArrayAdapter<PlaceType>(spinner.context,
-                        android.R.layout.simple_spinner_item, items)
-            }
+            spinner.adapter = ArrayAdapter<PlaceType>(spinner.context,
+                    android.R.layout.simple_spinner_item, items)
+
             // Set index from given items
             if (type != null) {
                 val itemIndex = items.indexOfFirst { it.id == type.id }

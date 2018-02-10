@@ -62,9 +62,9 @@ script:
   - adb shell svc power stayon true
   # Make gradle output info-level logging, so the tests do not timeout
   - ./gradlew build connectCheck --info -PdisablePreDex;
-  # Run local unit test
+  # Run local unit test (don't deploy application)
   # - ./gradlew test
-  # Run Instrumented unit test
+  # Run Instrumented unit test (deploy application)
   - ./gradlew connectedAndroidTest
 
 before_install:

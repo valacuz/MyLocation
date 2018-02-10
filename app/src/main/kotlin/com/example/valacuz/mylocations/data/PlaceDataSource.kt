@@ -1,12 +1,14 @@
 package com.example.valacuz.mylocations.data
 
+import io.reactivex.Flowable
+
 interface PlaceDataSource {
 
-    fun getAllPlaces(): List<PlaceItem>?
+    fun getAllPlaces(): Flowable<List<PlaceItem>>
 
-    fun getAllTypes(): List<PlaceType>?
+    fun getAllTypes(): Flowable<List<PlaceType>>
 
-    fun getById(placeId: String): PlaceItem?
+    fun getById(placeId: String): Flowable<PlaceItem>
 
     fun addPlace(placeItem: PlaceItem)
 
@@ -14,5 +16,5 @@ interface PlaceDataSource {
 
     fun deletePlace(placeItem: PlaceItem)
 
-    fun clearPlace()
+    fun clearPlaces()
 }

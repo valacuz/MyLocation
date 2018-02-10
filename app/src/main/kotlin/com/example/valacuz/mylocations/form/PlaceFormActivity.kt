@@ -4,6 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.annotation.VisibleForTesting
+import android.support.test.espresso.IdlingResource
+import android.support.test.espresso.idling.CountingIdlingResource
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
@@ -16,7 +19,6 @@ import com.example.valacuz.mylocations.picker.PlacePickerActivity
 class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
 
     private val VIEW_MODEL_TAG = "FORM_VM_TAG"
-
     private val REQUEST_PICK_LOCATION = 1001
 
     private lateinit var mViewModel: PlaceFormViewModel
@@ -107,8 +109,8 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
             // If the ViewModel was retained, return it.
             holder.getViewModel()!!
         } else {
-            val itemDataSource: PlaceDataSource = MemoryPlaceDataSource.INSTANCE
-            val viewModel = PlaceFormViewModel(itemDataSource, mPlaceId)
+            val itemDataSource: PlaceDataSource = MemoryPlaceDataSource.getInstance()
+            val viewModel = PlaceFormViewModel(this, itemDataSource, mPlaceId)
             supportFragmentManager
                     .beginTransaction()
                     .add(ViewModelHolder<PlaceFormViewModel>().createContainer(viewModel),
@@ -130,5 +132,10 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
                     .commit()
         }
         return fragment
+    }
+
+    @VisibleForTesting
+    fun getCountingIdlingResource(): IdlingResource {
+        return CountingIdlingResource(PlaceFormActivity::class.java.name)
     }
 }
