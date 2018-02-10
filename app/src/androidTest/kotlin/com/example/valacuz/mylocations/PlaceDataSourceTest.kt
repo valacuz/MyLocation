@@ -140,19 +140,21 @@ class PlaceDataSourceTest {
                 })
     }
 
-    private const val FIRST_PLACE = PlaceItem("CHULA",
-            13.741734,
-            100.516680,
-            1,
-            false)
-    private const val SECOND_PLACE = PlaceItem("MBK",
-            13.743490,
-            100.530778,
-            2,
-            false)
-    private const val THIRD_PLACE = PlaceItem("Dice Cup Board Game Cafe",
-            13.743240,
-            100.527709,
-            4,
-            true)
+    companion object {
+        private val FIRST_PLACE = PlaceItem("CHULA",
+                13.741734,
+                100.516680,
+                1,
+                false)
+        private val SECOND_PLACE = PlaceItem("MBK",
+                13.743490,
+                100.530778,
+                2,
+                false)
+        private val THIRD_PLACE = PlaceItem("Dice Cup Board Game Cafe",
+                13.743240,
+                100.527709,
+                4,
+                true)
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.valacuz.mylocations.ui
 
+import android.content.Intent
 import android.support.test.InstrumentationRegistry
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.IdlingRegistry
@@ -7,6 +8,7 @@ import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.intent.Intents.intended
+import android.support.test.espresso.intent.matcher.IntentMatchers.hasAction
 import android.support.test.espresso.intent.matcher.IntentMatchers.toPackage
 import android.support.test.espresso.intent.rule.IntentsTestRule
 import android.support.test.espresso.matcher.RootMatchers.isDialog
@@ -59,16 +61,10 @@ class PlaceFormActivityTest {
 
     @Test
     fun addPlace_saved() {
-        val placeName = "HOME"
+        val placeName = "ADD_PLACE"
 
-        // Precondition: Click on add button
-        onView(withId(R.id.add_button)).perform(click())
-
-        // Given text "HOME" on place name and close soft keyboard
-        onView(withId(R.id.text_name)).perform(typeText(placeName), closeSoftKeyboard())
-
-        // When save the place
-        onView(withId(R.id.menu_action_save)).perform(click())
+        // Given success
+        addSuccessPlace(placeName)
 
         // Then the new place must be display on the place list
         onView(withRecyclerItemText(placeName)).check(matches(isDisplayed()))
@@ -76,13 +72,16 @@ class PlaceFormActivityTest {
 
     @Test
     fun editPlace_saved() {
-        val oldPlaceName = "HOME"
-        val newPlaceName = "SCHOOL"
+        val oldPlaceName = "BEFORE_PLACE"
+        val newPlaceName = "AFTER_PLACE"
 
-        // Precondition: Click on item with text "HOME"
+        // Precondition: Given place name "BEFORE_PLACE"
+        addSuccessPlace(oldPlaceName)
+
+        // and Click on item with text "BEFORE_PLACE"
         onView(withRecyclerItemText(oldPlaceName)).perform(click())
 
-        // Given text "SCHOOL" to replace on place name and close soft keyboard
+        // Given text "AFTER_PLACE" to replace on place name and close soft keyboard
         onView(withId(R.id.text_name)).perform(replaceText(newPlaceName), closeSoftKeyboard())
 
         // When save the place
@@ -95,64 +94,72 @@ class PlaceFormActivityTest {
         onView(withRecyclerItemText(oldPlaceName)).check(doesNotExist())
     }
 
-    /*
     @Test
     fun showMap_displayDialog() {
-        val placeName = "SCHOOL"
+        val placeName = "SHOW_PLACE"
 
-        // Given item name "SCHOOL" on the place list
+        // Given item name "SHOW_PLACE" on the place list
+        addSuccessPlace(placeName)
+
+        // When long click on item name "SHOW_PLACE"
         onView(withRecyclerItemText(placeName)).perform(longClick())
 
-        // When "Show on map" menu clicked
+        // and click on menu "Show on map"
         val menuText = InstrumentationRegistry.getTargetContext()
                 .resources.getStringArray(R.array.item_choices)
         onView(withText(menuText[0])).inRoot(isDialog()).perform(click())
 
-        // Then an intent resolving to the "phone" activity has been sent.
+        // Then an intent resolving to the "google map" activity has been sent.
         intended(toPackage("com.google.android.apps.maps"))
-
-        /*
-        val activityResult = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
-        intending(toPackage("com.google.android.apps.maps")).respondWith(activityResult)
-        */
     }
 
     @Test
     fun sharePlace_displayDialog() {
-        val placeName = "SCHOOL"
+        val placeName = "SHARE_PLACE"
 
-        // Given item name "SCHOOL" on the place list
+        // Given item name "SHARE_PLACE" on the place list
+        addSuccessPlace(placeName)
+
+        // When long click at that item
         onView(withRecyclerItemText(placeName)).perform(longClick())
 
-        // When "Share" menu clicked
+        // and click on menu "Share"
         val menuText = InstrumentationRegistry.getTargetContext()
                 .resources.getStringArray(R.array.item_choices)
         onView(withText(menuText[1])).inRoot(isDialog()).perform(click())
 
-        // Then an intent resolving to the "phone" activity has been sent.
-        intended(toPackage("com.google.android.apps.maps"))
-
-        /*
-        intended(allOf(
-                hasAction(Intent.ACTION_SEND),
-                hasExtra(Intent.EXTRA_TEXT, "")))
-        */
+        // Then an intent chooser for sharing must be display.
+        intended(hasAction(Intent.ACTION_CHOOSER))
     }
-    */
 
     @Test
     fun deletePlace_doesNotExist() {
-        val placeName = "HOME"
+        val placeName = "DELETE_PLACE"
 
-        // Given item name "SCHOOL" on the place list
+        // Given item name "DELETE_PLACE" on the place list
+        addSuccessPlace(placeName)
+
+        // When long click at that item
         onView(withRecyclerItemText(placeName)).perform(longClick())
 
-        // When "Delete this place" menu clicked
+        // and click on menu "Delete"
         val menuText = InstrumentationRegistry.getTargetContext()
                 .resources.getStringArray(R.array.item_choices)
         onView(withText(menuText[2])).inRoot(isDialog()).perform(click())
 
         // Then the place name must disappear from the place list
         onView(withRecyclerItemText(placeName)).check(doesNotExist())
+    }
+
+    // Helper method that add place by specific name.
+    private fun addSuccessPlace(placeName: String) {
+        // Precondition: Click on add button
+        onView(withId(R.id.add_button)).perform(click())
+
+        // Given text "HOME" on place name and close soft keyboard
+        onView(withId(R.id.text_name)).perform(typeText(placeName), closeSoftKeyboard())
+
+        // When save the place
+        onView(withId(R.id.menu_action_save)).perform(click())
     }
 }
