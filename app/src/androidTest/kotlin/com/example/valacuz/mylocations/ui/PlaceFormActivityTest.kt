@@ -18,10 +18,7 @@ import android.support.test.runner.AndroidJUnit4
 import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.list.PlaceListActivity
 import com.example.valacuz.mylocations.ui.matchers.MatcherUtils.Companion.withRecyclerItemText
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
@@ -94,7 +91,10 @@ class PlaceFormActivityTest {
         onView(withRecyclerItemText(oldPlaceName)).check(doesNotExist())
     }
 
-    @Test
+    // Due to this case must be tested on emulator which support google play service.
+    // I have to temporary ignore this case until I can setup travis ci for testing it.
+    // @Test
+    @Ignore
     fun showMap_displayDialog() {
         val placeName = "SHOW_PLACE"
 
@@ -113,7 +113,10 @@ class PlaceFormActivityTest {
         intended(toPackage("com.google.android.apps.maps"))
     }
 
-    @Test
+    // Due to this case must be tested on emulator which support google play service.
+    // I have to temporary ignore this case until I can setup travis ci for testing it.
+    // @Test
+    @Ignore
     fun sharePlace_displayDialog() {
         val placeName = "SHARE_PLACE"
 

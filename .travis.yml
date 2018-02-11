@@ -34,8 +34,7 @@ android:
     - extra-android-m2repository  # design library
 
     # Specify system image
-    # - sys-img-armeabi-v7a-android-22
-    - sys-img-armeabi-v7a-google_apis-22
+    - sys-img-armeabi-v7a-android-22
 
   # Accept licenses
   licenses: 
@@ -51,11 +50,9 @@ before_script:
   - echo y | android update sdk --no-ui --all --filter extra-android-support
   - echo y | android update sdk --no-ui --all --filter build-tools-26.0.2
   - echo y | android update sdk --no-ui --all --filter android-22
-  # - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
-  - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-google_apis-22
+  - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
   # Create emulator
-  # - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
-  - echo no | android create avd --force -n test -t android_22 --abi armeabi-v7a --tag google_apis
+  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
   # Start emulator
   - emulator -avd test -no-audio -no-window &
 
