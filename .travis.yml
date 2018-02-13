@@ -63,10 +63,10 @@ before_script:
   - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;android;m2repository' > /dev/null
   - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;google;m2repository' > /dev/null
   - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;google;google_play_services' > /dev/null
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'system-images;android-22;google_apis;armeabi-v7a' > /dev/null
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'system-images;android-22;default;armeabi-v7a' > /dev/null
 
   # Create emulator
-  - echo no | android create avd --force -n test -t android-22 --abi google_apis/armeabi-v7a
+  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
   # Start emulator
   - emulator -avd test -no-audio -no-window &
 
