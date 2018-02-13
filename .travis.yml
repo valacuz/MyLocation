@@ -4,21 +4,28 @@ sudo: required
 dist: trusty
 group: travis_lts
 
-# Dependency caching in Gradle
+# Do not cache a few gradle files or directories (see https://docs.travis-ci.com/user/languages/java/#Caching)
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 
 cache:
   directories:
+    # Android SDK
+    - $HOME/android-sdk
+    - $HOME/android-sdk-dl
+
+    # Gradle dependencies
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+
+    # Android build cache (see http://tools.android.com/tech-docs/build-cache)
     - $HOME/.android/build-cache
 
 android:
   components:
     - tools # to install Android SDK tools 25+, latest, cannot get more granular control than this
-    # See https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943 for more details.
+    # (See https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943 for more details.)
     - platform-tools #latest
 
     # build tools version
@@ -43,16 +50,23 @@ android:
     - 'google-gdk-license-.+'
 
 before_script:
-  # Update android SDK
-  - echo y | android update sdk --no-ui --all --filter extra-google-m2repository
-  - echo y | android update sdk --no-ui --all --filter extra-google-google_play_service
-  - echo y | android update sdk --no-ui --all --filter extra-android-m2repository
-  - echo y | android update sdk --no-ui --all --filter extra-android-support
-  - echo y | android update sdk --no-ui --all --filter build-tools-26.0.2
-  - echo y | android update sdk --no-ui --all --filter android-22
-  - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
+  # Download and unzip the Android SDK tools (if not already there)
+  # Latest version available here: https://developer.android.com/studio/index.html#downloads
+  - if test ! -e $HOME/android-sdk-dl/sdk-tools.zip ; then curl https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip > $HOME/android-sdk-dl/sdk-tools.zip ; fi
+  - unzip -qq -n $HOME/android-sdk-dl/sdk-tools.zip -d $HOME/android-sdk
+
+  # Install or update Android SDK components (will not do anything if already up to date)
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'tools' > /dev/null
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'platform-tools' > /dev/null
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'build-tools;26.0.2' > /dev/null
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'platforms;android-22' > /dev/null
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;android;m2repository' > /dev/null
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;google;m2repository' > /dev/null
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;google;google_play_services' > /dev/null
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'system-images;android-22;google_apis;armeabi-v7a' > /dev/null
+
   # Create emulator
-  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+  - echo no | android create avd --force -n test -t android-22 --abi google_apis/armeabi-v7a
   # Start emulator
   - emulator -avd test -no-audio -no-window &
 
