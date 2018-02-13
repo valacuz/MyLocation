@@ -66,7 +66,8 @@ before_script:
   - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'system-images;android-22;default;armeabi-v7a' > /dev/null
 
   # Create emulator
-  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+  # - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+  - echo no | android create avd --force -n test --tag default --abi armeabi-v7a --package system-images;android-22;default;armeabi-v7a
   # Start emulator
   - emulator -avd test -no-audio -no-window &
 
