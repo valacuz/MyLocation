@@ -59,7 +59,7 @@ before_script:
   - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'tools' > /dev/null
   - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'platform-tools' > /dev/null
   - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'build-tools;26.0.2' > /dev/null
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'platforms;android-22' > /dev/null
+  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'platforms;android-26' > /dev/null
   - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;android;m2repository' > /dev/null
   - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;google;m2repository' > /dev/null
   - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;google;google_play_services' > /dev/null
@@ -67,7 +67,7 @@ before_script:
 
   # Create emulator
   # - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
-  - echo no | android create avd --force -n test --tag default --abi armeabi-v7a --package system-images;android-22;default;armeabi-v7a
+  - echo no | android create avd --force -n test --t android-22 --abi armeabi-v7a
   # Start emulator
   - emulator -avd test -no-audio -no-window &
 
