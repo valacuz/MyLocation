@@ -1,11 +1,5 @@
-Travis CI: Basic config
-
-
 language: android
 jdk: oraclejdk8
-sudo: required
-dist: trusty
-group: travis_lts
 
 # Dependency caching in Gradle
 before_cache:
@@ -47,13 +41,13 @@ android:
 
 before_script:
   # Update android SDK
-  # - echo y | android update sdk --no-ui --all --filter extra-google-m2repository
-  # - echo y | android update sdk --no-ui --all --filter extra-google-google_play_service
-  # - echo y | android update sdk --no-ui --all --filter extra-android-m2repository
-  # - echo y | android update sdk --no-ui --all --filter extra-android-support
-  # - echo y | android update sdk --no-ui --all --filter build-tools-26.0.2
-  # - echo y | android update sdk --no-ui --all --filter android-22
-  # - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
+  - echo y | android update sdk --no-ui --all --filter extra-google-m2repository
+  - echo y | android update sdk --no-ui --all --filter extra-google-google_play_service
+  - echo y | android update sdk --no-ui --all --filter extra-android-m2repository
+  - echo y | android update sdk --no-ui --all --filter extra-android-support
+  - echo y | android update sdk --no-ui --all --filter build-tools-26.0.2
+  - echo y | android update sdk --no-ui --all --filter android-22
+  - echo y | android update sdk --no-ui --all --filter sys-img-armeabi-v7a-android-22
   # Create emulator
   - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
   # Start emulator
@@ -72,9 +66,3 @@ script:
   # - ./gradlew test
   # Run Instrumented unit test (deploy application)
   - ./gradlew connectedAndroidTest
-
-before_install:
-  - mkdir "$ANDROID_HOME/licenses" || true
-  # License agreement for 
-  - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
-  - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
