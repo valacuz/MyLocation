@@ -1,62 +1,49 @@
 language: android
-jdk: oraclejdk8
-
-android:
-  components:
-    - android-26  # SDK version
-    - build-tools-26.0.2  # build tools version
-    - extra-google-m2repository
-    - extra-google-google_play_service  # play service
-    - extra-android-support # support library
-    - extra-android-m2repository  # design library
-
-    - tools # to install Android SDK tools 25+, latest, cannot get more granular control than this
-    # (See https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943 for more details.)
-    - platform-tools #latest
-
-    # Specify system image
-    - addon-google_apis-google-21
-    - sys-img-armeabi-v7a-google_apis-google-21
-
-  # Accept licenses
-  licenses: 
-    - 'android-sdk-preview-license-.+'
-    - 'android-sdk-license-.+'
-    - 'google-gdk-license-.+'
-
-# Do not cache a few gradle files or directories (see https://docs.travis-ci.com/user/languages/java/#Caching)
-before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+jdk: oraclejdk7
+# Use the Travis Container-Based Infrastructure
+sudo: false
 
 cache:
   directories:
-    # Gradle dependencies
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+    - ${TRAVIS_BUILD_DIR}/gradle/caches/
+    - ${TRAVIS_BUILD_DIR}/gradle/wrapper/dists/
 
-    # Android build cache (see http://tools.android.com/tech-docs/build-cache)
-    - $HOME/.android/build-cache
+env:
+  global:
+    - ANDROID_API_LEVEL=23
+    - EMULATOR_API_LEVEL=21
+    - ANDROID_BUILD_TOOLS_VERSION=23.0.2
+    - ANDROID_ABI=armeabi-v7a
+    - ANDROID_TAG=google_apis
+    - ADB_INSTALL_TIMEOUT=20 # minutes (2 minutes by default)
+
+android:
+  components:
+    - tools # to get the new `repository-11.xml`
+    - platform-tools
+    - tools # to install Android SDK tools 25.1.x
+    - build-tools-$ANDROID_BUILD_TOOLS_VERSION
+    - android-$ANDROID_API_LEVEL
+    - android-$EMULATOR_API_LEVEL
+    # For Google APIs
+    - addon-google_apis-google-$ANDROID_API_LEVEL
+    - addon-google_apis-google-$EMULATOR_API_LEVEL
+    # Google Play Services
+    - extra-google-google_play_services
+    # Support library
+    - extra-android-support
+    # Latest artifacts in local repository
+    - extra-google-m2repository
+    - extra-android-m2repository
+    # Specify at least one system image
+    - sys-img-armeabi-v7a-google_apis-$ANDROID_API_LEVEL
+    - sys-img-armeabi-v7a-google_apis-$EMULATOR_API_LEVEL
 
 before_script:
-  # Create emulator
-  - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a --tag google_apis
-  # Start emulator
-  - emulator -avd test -no-audio -no-window &
+  # Create and start emulator
+  - echo no | android create avd --force -n test -t "android-"$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
+  - emulator -avd test -no-skin -no-audio -no-window &
+  - android-wait-for-emulator
 
 script:
-  # Wait until emulator started
-  - android-wait-for-emulator
-  # Unlock emulator
-  - adb shell input keyevent 82
-  # Prevent emulator locking itself again
-  - adb shell svc power stayon true
-  # Make gradle output info-level logging, so the tests do not timeout
-  - ./gradlew build connectCheck --info -PdisablePreDex;
-  # Run local unit test (don't deploy application)
-  # - ./gradlew test
-  # Run Instrumented unit test (deploy application)
-  - ./gradlew connectedAndroidTest
-
-after_success:
-  - bash echo "Hell Yeah!"
+  - ./gradlew clean check connectedCheck -x library:signArchives -PdisablePreDex
