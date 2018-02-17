@@ -1,8 +1,27 @@
 language: android
 jdk: oraclejdk8
-sudo: required
-dist: trusty
-group: travis_lts
+
+android:
+  components:
+    - android-26  # SDK version
+    - build-tools-26.0.2  # build tools version
+    - extra-google-m2repository
+    - extra-google-google_play_service  # play service
+    - extra-android-support # support library
+    - extra-android-m2repository  # design library
+
+    - tools # to install Android SDK tools 25+, latest, cannot get more granular control than this
+    # (See https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943 for more details.)
+    - platform-tools #latest
+
+    # Specify system image
+    - sys-img-armeabi-v7a-addon-google_apis-google-22
+
+  # Accept licenses
+  licenses: 
+    - 'android-sdk-preview-license-.+'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
 
 # Do not cache a few gradle files or directories (see https://docs.travis-ci.com/user/languages/java/#Caching)
 before_cache:
@@ -11,10 +30,6 @@ before_cache:
 
 cache:
   directories:
-    # Android SDK
-    - $HOME/android-sdk
-    - $HOME/android-sdk-dl
-
     # Gradle dependencies
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
@@ -22,52 +37,9 @@ cache:
     # Android build cache (see http://tools.android.com/tech-docs/build-cache)
     - $HOME/.android/build-cache
 
-android:
-  components:
-    - tools # to install Android SDK tools 25+, latest, cannot get more granular control than this
-    # (See https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943 for more details.)
-    - platform-tools #latest
-
-    # build tools version
-    - build-tools-26.0.2
-
-    # Android SDK version
-    - android-26
-
-    # Addition components
-    - extra-google-m2repository
-    - extra-google-google_play_service  # play service
-    - extra-android-support # support library
-    - extra-android-m2repository  # design library
-
-    # Specify system image
-    - sys-img-armeabi-v7a-android-22
-
-  # Accept licenses
-  licenses: 
-    - 'android-sdk-preview-license-.+'
-    - 'android-sdk-license-.+'
-    - 'google-gdk-license-.+'
-
 before_script:
-  # Download and unzip the Android SDK tools (if not already there)
-  # Latest version available here: https://developer.android.com/studio/index.html#downloads
-  - if test ! -e $HOME/android-sdk-dl/sdk-tools.zip ; then curl https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip > $HOME/android-sdk-dl/sdk-tools.zip ; fi
-  - unzip -qq -n $HOME/android-sdk-dl/sdk-tools.zip -d $HOME/android-sdk
-
-  # Install or update Android SDK components (will not do anything if already up to date)
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'tools' > /dev/null
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'platform-tools' > /dev/null
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'build-tools;26.0.2' > /dev/null
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'platforms;android-26' > /dev/null
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;android;m2repository' > /dev/null
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;google;m2repository' > /dev/null
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'extras;google;google_play_services' > /dev/null
-  - echo y | $HOME/android-sdk/tools/bin/sdkmanager 'system-images;android-22;default;armeabi-v7a' > /dev/null
-
   # Create emulator
-  # - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
-  - echo no | android create avd --force -n test --t android-22 --abi armeabi-v7a
+  - echo no | android create avd --force -n test -t "Google Inc.:Google APIs:22" --abi google_apis/armeabi-v7a
   # Start emulator
   - emulator -avd test -no-audio -no-window &
 
@@ -85,8 +57,5 @@ script:
   # Run Instrumented unit test (deploy application)
   - ./gradlew connectedAndroidTest
 
-before_install:
-  - mkdir "$ANDROID_HOME/licenses" || true
-  # License agreement for 
-  - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
-  - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+after_success:
+  - bash echo "Hell Yeah!"
