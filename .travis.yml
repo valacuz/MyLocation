@@ -16,7 +16,7 @@ android:
 
     # Specify system image
     - addon-google_apis-google-22
-    - sys-img-armeabi-v7a-addon-google_apis-google-22
+    - sys-img-armeabi-v7a-google_apis-google-22
 
   # Accept licenses
   licenses: 
@@ -40,7 +40,7 @@ cache:
 
 before_script:
   # Create emulator
-  - echo no | android create avd --force -n test -t "Google Inc.:Google APIs:22" --abi google_apis/armeabi-v7a
+  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a --tag google_apis
   # Start emulator
   - emulator -avd test -no-audio -no-window &
 
