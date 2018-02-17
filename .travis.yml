@@ -15,6 +15,7 @@ android:
     - platform-tools #latest
 
     # Specify system image
+    - addon-google_apis-google-22
     - sys-img-armeabi-v7a-addon-google_apis-google-22
 
   # Accept licenses
