@@ -68,7 +68,9 @@ class PlacePickerViewModel(locationSource: LocationProviderSource) : BaseObserva
 
     fun onActivityDestroyed() {
         locationSource.stopUpdates()
-        compositeDisposable.clear()
+        if (!compositeDisposable.isDisposed) {
+            compositeDisposable.dispose()
+        }
         navigator = null   // Remove navigator references to avoid leaks
     }
 }

@@ -6,11 +6,12 @@ import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.data.PlaceDataSource
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.PlaceType
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import com.example.valacuz.mylocations.util.ScheduleStrategy
+import io.reactivex.disposables.CompositeDisposable
 
 class PlaceFormViewModel(context: Context,
                          private val itemDataSource: PlaceDataSource,
+                         private val scheduleStrategy: ScheduleStrategy,
                          id: String? = null)
     : BaseObservable() {
 
@@ -41,6 +42,9 @@ class PlaceFormViewModel(context: Context,
 
     private val placeId: String? = id
 
+    //
+    private val compositeDisposable = CompositeDisposable()
+
     fun setNavigator(navigator: PlaceFormNavigator) {
         this.navigator = navigator
     }
@@ -53,6 +57,9 @@ class PlaceFormViewModel(context: Context,
     }
 
     fun onActivityDestroyed() {
+        if (!compositeDisposable.isDisposed) {
+            compositeDisposable.dispose()
+        }
         navigator = null // Remove navigator references to avoid leaks.
     }
 
@@ -79,22 +86,22 @@ class PlaceFormViewModel(context: Context,
     private fun isNewLocation(): Boolean = placeId == null
 
     private fun populatePlaceType() {
-        itemDataSource.getAllTypes()
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
+        val disposable = itemDataSource.getAllTypes()
+                .compose(scheduleStrategy.applySchedule())
                 .subscribe({ types -> placeTypes.addAll(types) })
+        compositeDisposable.add(disposable)
     }
 
     private fun populateItem(placeId: String) {
-        itemDataSource.getById(placeId)
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
+        val disposable = itemDataSource.getById(placeId)
+                .compose(scheduleStrategy.applySchedule())
                 .subscribe({ placeItem ->
                     name.set(placeItem.name)
                     starred.set(placeItem.isStarred)
                     setCoordinate(placeItem.latitude, placeItem.longitude)
                     selectedType.set(placeTypes.first { it.id == placeItem.type })
                 })
+        compositeDisposable.add(disposable)
     }
 
     private fun addLocation(name: String?,

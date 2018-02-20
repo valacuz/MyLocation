@@ -52,6 +52,7 @@ class FusedLocationSource private constructor(context: Context) : LocationProvid
         fun getInstance(context: Context): FusedLocationSource =
                 INSTANCE ?: synchronized(this) {
                     INSTANCE ?: FusedLocationSource(context.applicationContext)
+                            .also { INSTANCE = it }
                 }
     }
 }

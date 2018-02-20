@@ -2,19 +2,19 @@ package com.example.valacuz.mylocations.form
 
 import android.app.Activity
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.annotation.VisibleForTesting
 import android.support.test.espresso.IdlingResource
 import android.support.test.espresso.idling.CountingIdlingResource
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.ViewModelHolder
-import com.example.valacuz.mylocations.data.PlaceDataSource
-import com.example.valacuz.mylocations.data.repository.MemoryPlaceDataSource
+import com.example.valacuz.mylocations.data.repository.room.LocalPlaceDataSource
 import com.example.valacuz.mylocations.picker.PlacePickerActivity
+import com.example.valacuz.mylocations.util.DefaultScheduleStrategy
 
 class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
 
@@ -109,8 +109,9 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
             // If the ViewModel was retained, return it.
             holder.getViewModel()!!
         } else {
-            val itemDataSource: PlaceDataSource = MemoryPlaceDataSource.getInstance()
-            val viewModel = PlaceFormViewModel(this, itemDataSource, mPlaceId)
+            val itemDataSource = LocalPlaceDataSource.getInstance(this)
+            val scheduleStrategy = DefaultScheduleStrategy()
+            val viewModel = PlaceFormViewModel(this, itemDataSource, scheduleStrategy, mPlaceId)
             supportFragmentManager
                     .beginTransaction()
                     .add(ViewModelHolder<PlaceFormViewModel>().createContainer(viewModel),

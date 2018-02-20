@@ -7,10 +7,13 @@ import android.databinding.ObservableList
 import com.example.valacuz.mylocations.BR
 import com.example.valacuz.mylocations.data.PlaceDataSource
 import com.example.valacuz.mylocations.data.PlaceItem
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import com.example.valacuz.mylocations.util.ScheduleStrategy
+import io.reactivex.disposables.CompositeDisposable
 
-class PlaceListViewModel(private val itemDataSource: PlaceDataSource) : BaseObservable() {
+class PlaceListViewModel(private val itemDataSource: PlaceDataSource,
+                         private val scheduleStrategy: ScheduleStrategy) : BaseObservable() {
+
+    private val compositeDisposable = CompositeDisposable()
 
     // Bindable values
     val items: ObservableList<PlaceItem> = ObservableArrayList()
@@ -32,6 +35,9 @@ class PlaceListViewModel(private val itemDataSource: PlaceDataSource) : BaseObse
     }
 
     fun onActivityDestroyed() {
+        if (!compositeDisposable.isDisposed) {
+            compositeDisposable.dispose()
+        }
         navigator = null   // Remove navigator references to avoid leaks.
     }
 
@@ -42,13 +48,13 @@ class PlaceListViewModel(private val itemDataSource: PlaceDataSource) : BaseObse
     }
 
     fun loadItems() {
-        itemDataSource.getAllPlaces()
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
+        val disposable = itemDataSource.getAllPlaces()
+                .compose(scheduleStrategy.applySchedule())
                 .subscribe({ places ->
                     items.clear()
                     items.addAll(places)
                     notifyPropertyChanged(BR.empty) // It's a @Bindable so update manually.
                 })
+        compositeDisposable.add(disposable)
     }
 }

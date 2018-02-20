@@ -14,7 +14,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @Suppress("FunctionName")
-class PlaceDataSourceTest {
+class PlaceRoomTest {
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()

@@ -10,14 +10,14 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.ViewModelHolder
-import com.example.valacuz.mylocations.data.PlaceDataSource
 import com.example.valacuz.mylocations.data.PlaceItem
-import com.example.valacuz.mylocations.data.repository.MemoryPlaceDataSource
-import com.example.valacuz.mylocations.form.PlaceFormActivity
+import com.example.valacuz.mylocations.data.repository.room.LocalPlaceDataSource
 import com.example.valacuz.mylocations.domain.display.GoogleMapDisplaySource
 import com.example.valacuz.mylocations.domain.display.MapDisplaySource
 import com.example.valacuz.mylocations.domain.share.GoogleMapShareSource
 import com.example.valacuz.mylocations.domain.share.ShareContentSource
+import com.example.valacuz.mylocations.form.PlaceFormActivity
+import com.example.valacuz.mylocations.util.DefaultScheduleStrategy
 
 class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigator {
 
@@ -112,8 +112,9 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
             holder.getViewModel()!!
         } else {
             // If there no ViewModel yet, create it.
-            val itemDataSource: PlaceDataSource = MemoryPlaceDataSource.getInstance()
-            val viewModel = PlaceListViewModel(itemDataSource)
+            val itemDataSource = LocalPlaceDataSource.getInstance(this)
+            val scheduleStrategy = DefaultScheduleStrategy()
+            val viewModel = PlaceListViewModel(itemDataSource, scheduleStrategy)
             supportFragmentManager
                     .beginTransaction()
                     .add(ViewModelHolder<PlaceListViewModel>().createContainer(viewModel),
