@@ -11,7 +11,7 @@ import android.support.v7.widget.Toolbar
 import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.ViewModelHolder
 import com.example.valacuz.mylocations.data.PlaceItem
-import com.example.valacuz.mylocations.data.repository.room.LocalPlaceDataSource
+import com.example.valacuz.mylocations.data.repository.room.RoomPlaceDataSource
 import com.example.valacuz.mylocations.domain.display.GoogleMapDisplaySource
 import com.example.valacuz.mylocations.domain.display.MapDisplaySource
 import com.example.valacuz.mylocations.domain.share.GoogleMapShareSource
@@ -112,7 +112,7 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
             holder.getViewModel()!!
         } else {
             // If there no ViewModel yet, create it.
-            val itemDataSource = LocalPlaceDataSource.getInstance(this)
+            val itemDataSource = RoomPlaceDataSource.getInstance(this)
             val scheduleStrategy = DefaultScheduleStrategy()
             val viewModel = PlaceListViewModel(itemDataSource, scheduleStrategy)
             supportFragmentManager

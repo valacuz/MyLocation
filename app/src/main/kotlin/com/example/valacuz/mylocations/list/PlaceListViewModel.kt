@@ -5,7 +5,7 @@ import android.databinding.Bindable
 import android.databinding.ObservableArrayList
 import android.databinding.ObservableList
 import com.example.valacuz.mylocations.BR
-import com.example.valacuz.mylocations.data.PlaceDataSource
+import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.util.ScheduleStrategy
 import io.reactivex.disposables.CompositeDisposable

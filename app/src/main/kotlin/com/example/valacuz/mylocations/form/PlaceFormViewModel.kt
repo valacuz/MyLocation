@@ -3,14 +3,16 @@ package com.example.valacuz.mylocations.form
 import android.content.Context
 import android.databinding.*
 import com.example.valacuz.mylocations.R
-import com.example.valacuz.mylocations.data.PlaceDataSource
+import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.PlaceType
+import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
 import com.example.valacuz.mylocations.util.ScheduleStrategy
 import io.reactivex.disposables.CompositeDisposable
 
 class PlaceFormViewModel(context: Context,
                          private val itemDataSource: PlaceDataSource,
+                         private val typeDataSource: PlaceTypeDataSource,
                          private val scheduleStrategy: ScheduleStrategy,
                          id: String? = null)
     : BaseObservable() {
@@ -86,7 +88,7 @@ class PlaceFormViewModel(context: Context,
     private fun isNewLocation(): Boolean = placeId == null
 
     private fun populatePlaceType() {
-        val disposable = itemDataSource.getAllTypes()
+        val disposable = typeDataSource.getAllTypes()
                 .compose(scheduleStrategy.applySchedule())
                 .subscribe({ types -> placeTypes.addAll(types) })
         compositeDisposable.add(disposable)

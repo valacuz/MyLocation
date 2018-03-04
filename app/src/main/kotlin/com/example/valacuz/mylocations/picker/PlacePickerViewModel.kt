@@ -3,7 +3,7 @@ package com.example.valacuz.mylocations.picker
 import android.databinding.BaseObservable
 import android.databinding.ObservableField
 import android.databinding.ObservableFloat
-import com.example.valacuz.mylocations.data.LocationProviderSource
+import com.example.valacuz.mylocations.data.repository.LocationProviderSource
 import com.google.android.gms.maps.model.LatLng
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

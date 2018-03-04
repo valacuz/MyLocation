@@ -12,14 +12,12 @@ import android.view.Menu
 import android.view.MenuItem
 import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.ViewModelHolder
-import com.example.valacuz.mylocations.data.repository.room.LocalPlaceDataSource
+import com.example.valacuz.mylocations.data.repository.room.RoomPlaceDataSource
+import com.example.valacuz.mylocations.data.repository.room.RoomPlaceTypeDataSource
 import com.example.valacuz.mylocations.picker.PlacePickerActivity
 import com.example.valacuz.mylocations.util.DefaultScheduleStrategy
 
 class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
-
-    private val VIEW_MODEL_TAG = "FORM_VM_TAG"
-    private val REQUEST_PICK_LOCATION = 1001
 
     private lateinit var mViewModel: PlaceFormViewModel
 
@@ -109,9 +107,10 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
             // If the ViewModel was retained, return it.
             holder.getViewModel()!!
         } else {
-            val itemDataSource = LocalPlaceDataSource.getInstance(this)
+            val itemDataSource = RoomPlaceDataSource.getInstance(this)
+            val typeDataSource = RoomPlaceTypeDataSource.getInstance(this)
             val scheduleStrategy = DefaultScheduleStrategy()
-            val viewModel = PlaceFormViewModel(this, itemDataSource, scheduleStrategy, mPlaceId)
+            val viewModel = PlaceFormViewModel(this, itemDataSource, typeDataSource, scheduleStrategy, mPlaceId)
             supportFragmentManager
                     .beginTransaction()
                     .add(ViewModelHolder<PlaceFormViewModel>().createContainer(viewModel),
@@ -138,5 +137,10 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
     @VisibleForTesting
     fun getCountingIdlingResource(): IdlingResource {
         return CountingIdlingResource(PlaceFormActivity::class.java.name)
+    }
+
+    companion object {
+        private const val VIEW_MODEL_TAG = "FORM_VM_TAG"
+        private const val REQUEST_PICK_LOCATION = 1001
     }
 }

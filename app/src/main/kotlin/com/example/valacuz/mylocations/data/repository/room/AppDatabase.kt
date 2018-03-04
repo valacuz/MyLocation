@@ -15,6 +15,8 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun placeItemDao(): PlaceDao
 
+    abstract fun placeTypeDao(): PlaceTypeDao
+
     companion object {
 
         @Volatile
@@ -37,7 +39,7 @@ abstract class AppDatabase : RoomDatabase() {
                                 // Insert pre-populate data in I/O thread
                                 Executors.newSingleThreadExecutor().execute({
                                     getInstance(context)
-                                            .placeItemDao()
+                                            .placeTypeDao()
                                             .addPlaceTypes(PRE_POPULATE_DATA)
                                 })
                             }
