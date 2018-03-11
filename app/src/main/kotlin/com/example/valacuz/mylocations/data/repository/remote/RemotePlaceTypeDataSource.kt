@@ -17,8 +17,21 @@ class RemotePlaceTypeDataSource private constructor(
                         }
                     }).toFlowable(BackpressureStrategy.LATEST)
 
-
     override fun addTypes(types: List<PlaceType>) {
         // Operation not support on remote.
+    }
+
+    override fun isDirty() = false // Never!
+
+    companion object {
+
+        @Volatile
+        private var INSTANCE: RemotePlaceTypeDataSource? = null
+
+        fun getInstance(samplePlaceService: SamplePlaceService) =
+                INSTANCE ?: synchronized(this) {
+                    INSTANCE ?: RemotePlaceTypeDataSource(samplePlaceService)
+                            .also { INSTANCE = it }
+                }
     }
 }
