@@ -20,7 +20,7 @@ class PlaceActionDialog : DialogFragment() {
         if (dialog == null) {
             val choices = resources.getStringArray(R.array.item_choices)
             val adapter = ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1, choices)
-            dialog = AlertDialog.Builder(activity)
+            dialog = AlertDialog.Builder(requireContext())
                     .setTitle(R.string.item_title)
                     .setAdapter(adapter, { _, position ->
                         when (position) {

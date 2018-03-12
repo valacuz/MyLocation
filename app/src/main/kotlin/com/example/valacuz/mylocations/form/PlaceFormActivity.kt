@@ -12,12 +12,17 @@ import android.view.Menu
 import android.view.MenuItem
 import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.ViewModelHolder
+import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
 import com.example.valacuz.mylocations.data.repository.room.RoomPlaceDataSource
-import com.example.valacuz.mylocations.data.repository.room.RoomPlaceTypeDataSource
+import com.example.valacuz.mylocations.di.MainApplication
 import com.example.valacuz.mylocations.picker.PlacePickerActivity
 import com.example.valacuz.mylocations.util.DefaultScheduleStrategy
+import javax.inject.Inject
 
 class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
+
+    @Inject
+    lateinit var placeTypeDataSource: PlaceTypeDataSource
 
     private lateinit var mViewModel: PlaceFormViewModel
 
@@ -26,6 +31,8 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_place_form)
+
+        (application as MainApplication).placeTypeComponent.inject(this)
 
         mPlaceId = intent?.extras?.getString("PLACE_ID")
         setupToolbar()
@@ -108,9 +115,9 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
             holder.getViewModel()!!
         } else {
             val itemDataSource = RoomPlaceDataSource.getInstance(this)
-            val typeDataSource = RoomPlaceTypeDataSource.getInstance(this)
             val scheduleStrategy = DefaultScheduleStrategy()
-            val viewModel = PlaceFormViewModel(this, itemDataSource, typeDataSource, scheduleStrategy, mPlaceId)
+            val viewModel = PlaceFormViewModel(this, itemDataSource, placeTypeDataSource,
+                    scheduleStrategy, mPlaceId)
             supportFragmentManager
                     .beginTransaction()
                     .add(ViewModelHolder<PlaceFormViewModel>().createContainer(viewModel),

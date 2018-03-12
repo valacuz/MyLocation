@@ -6,7 +6,7 @@ import io.reactivex.Flowable
 /**
  * The class with three source of PlaceTypeDataSource combined.
  */
-class ComposePlaceTypeDataSource private constructor(
+class CompositePlaceTypeDataSource private constructor(
         private val memorySource: PlaceTypeDataSource,
         private val localSource: PlaceTypeDataSource,
         private val remoteSource: PlaceTypeDataSource) : PlaceTypeDataSource {
@@ -44,13 +44,13 @@ class ComposePlaceTypeDataSource private constructor(
     companion object {
 
         @Volatile
-        private var INSTANCE: ComposePlaceTypeDataSource? = null
+        private var INSTANCE: CompositePlaceTypeDataSource? = null
 
         fun getInstance(memorySource: PlaceTypeDataSource,
                         localSource: PlaceTypeDataSource,
                         remoteSource: PlaceTypeDataSource) =
                 INSTANCE ?: synchronized(this) {
-                    INSTANCE ?: ComposePlaceTypeDataSource(
+                    INSTANCE ?: CompositePlaceTypeDataSource(
                             memorySource, localSource, remoteSource).also { INSTANCE = it }
                 }
     }

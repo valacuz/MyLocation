@@ -15,8 +15,6 @@ import com.google.android.gms.maps.GoogleMap
 
 class PlacePickerFragment : Fragment() {
 
-    private val LOCATION_REQUEST_CODE: Int = 3001
-
     private lateinit var viewModel: PlacePickerViewModel
     private lateinit var fragmentBinding: FragmentPlacePickerBinding
 
@@ -100,11 +98,13 @@ class PlacePickerFragment : Fragment() {
     }
 
     private fun isLocationPermissionGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(activity.applicationContext,
+        return ContextCompat.checkSelfPermission(requireContext().applicationContext,
                 android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 
     companion object {
+        private const val LOCATION_REQUEST_CODE = 3001
+
         fun newInstance(): PlacePickerFragment = PlacePickerFragment()
     }
 }

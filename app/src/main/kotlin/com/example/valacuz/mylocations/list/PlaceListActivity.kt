@@ -112,9 +112,9 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
             holder.getViewModel()!!
         } else {
             // If there no ViewModel yet, create it.
-            val itemDataSource = RoomPlaceDataSource.getInstance(this)
+            val roomDataSource = RoomPlaceDataSource.getInstance(this)
             val scheduleStrategy = DefaultScheduleStrategy()
-            val viewModel = PlaceListViewModel(itemDataSource, scheduleStrategy)
+            val viewModel = PlaceListViewModel(roomDataSource, scheduleStrategy)
             supportFragmentManager
                     .beginTransaction()
                     .add(ViewModelHolder<PlaceListViewModel>().createContainer(viewModel),

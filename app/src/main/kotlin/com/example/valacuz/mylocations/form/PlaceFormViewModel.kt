@@ -13,7 +13,7 @@ import io.reactivex.disposables.CompositeDisposable
 class PlaceFormViewModel(context: Context,
                          private val itemDataSource: PlaceDataSource,
                          private val typeDataSource: PlaceTypeDataSource,
-                         private val scheduleStrategy: ScheduleStrategy,
+                         private val ioSchedule: ScheduleStrategy,
                          id: String? = null)
     : BaseObservable() {
 
@@ -89,14 +89,14 @@ class PlaceFormViewModel(context: Context,
 
     private fun populatePlaceType() {
         val disposable = typeDataSource.getAllTypes()
-                .compose(scheduleStrategy.applySchedule())
+                .compose(ioSchedule.applySchedule())
                 .subscribe({ types -> placeTypes.addAll(types) })
         compositeDisposable.add(disposable)
     }
 
     private fun populateItem(placeId: String) {
         val disposable = itemDataSource.getById(placeId)
-                .compose(scheduleStrategy.applySchedule())
+                .compose(ioSchedule.applySchedule())
                 .subscribe({ placeItem ->
                     name.set(placeItem.name)
                     starred.set(placeItem.isStarred)
