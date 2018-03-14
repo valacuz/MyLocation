@@ -53,4 +53,18 @@ class RemotePlaceDataSource private constructor(
     override fun clearPlaces() {
         samplePlaceService.clearPlaces()
     }
+
+    override fun isDirty(): Boolean = false // Never!
+
+    companion object {
+
+        @Volatile
+        private var INSTANCE: RemotePlaceDataSource? = null
+
+        fun getInstance(samplePlaceService: SamplePlaceService) =
+                INSTANCE ?: synchronized(this) {
+                    INSTANCE ?: RemotePlaceDataSource(samplePlaceService)
+                            .also { INSTANCE = it }
+                }
+    }
 }

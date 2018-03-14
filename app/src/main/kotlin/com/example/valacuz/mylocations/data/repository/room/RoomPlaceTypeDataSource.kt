@@ -32,7 +32,7 @@ class RoomPlaceTypeDataSource private constructor(val context: Context) : PlaceT
         val ticks = PreferenceManager
                 .getDefaultSharedPreferences(context)
                 .getLong(KEY_PLACE_TYPE_TICKS, 0)
-        return System.currentTimeMillis() - ticks > (10 * 60 * 1_000) // 10 Minutes
+        return System.currentTimeMillis() - ticks > (60 * 60 * 1_000) // 1 Hour
     }
 
     companion object {

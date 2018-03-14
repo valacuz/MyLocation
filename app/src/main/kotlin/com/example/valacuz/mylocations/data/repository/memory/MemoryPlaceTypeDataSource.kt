@@ -6,20 +6,20 @@ import io.reactivex.Flowable
 
 class MemoryPlaceTypeDataSource private constructor() : PlaceTypeDataSource {
 
-    private val types: MutableList<PlaceType> = mutableListOf()
+    private val items: MutableList<PlaceType> = mutableListOf()
 
     private var ticks: Long = 0
 
-    override fun getAllTypes(): Flowable<List<PlaceType>> = Flowable.fromArray(types)
+    override fun getAllTypes(): Flowable<List<PlaceType>> = Flowable.fromArray(items)
 
     override fun addTypes(types: List<PlaceType>) {
-        this.types.addAll(types)
+        items.addAll(types)
         ticks = System.currentTimeMillis()
     }
 
     // Check is data is dirty (default 5 minutes or when data is empty)
     override fun isDirty() =
-            System.currentTimeMillis() - ticks > (5 * 60 * 1_000) || types.isEmpty()
+            System.currentTimeMillis() - ticks > (5 * 60 * 1_000) || items.isEmpty()
 
     companion object {
 

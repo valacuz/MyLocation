@@ -8,6 +8,8 @@ class MemoryPlaceDataSource private constructor() : PlaceDataSource {
 
     private val items: MutableList<PlaceItem> = mutableListOf()
 
+    private var ticks: Long = 0
+
     override fun getAllPlaces(): Flowable<List<PlaceItem>> = Flowable.fromArray(items)
 
     override fun getById(placeId: String): Flowable<PlaceItem> {
@@ -28,7 +30,8 @@ class MemoryPlaceDataSource private constructor() : PlaceDataSource {
     }
 
     override fun addPlaces(places: List<PlaceItem>) {
-
+        items.addAll(places)
+        ticks = System.currentTimeMillis()
     }
 
     override fun updatePlace(place: PlaceItem) {
@@ -45,6 +48,10 @@ class MemoryPlaceDataSource private constructor() : PlaceDataSource {
     override fun clearPlaces() {
         items.clear()
     }
+
+    // Check is data is dirty (default 5 minutes or when data is empty)
+    override fun isDirty() =
+            System.currentTimeMillis() - ticks > (5 * 60 * 1_000) || items.isEmpty()
 
     companion object {
 

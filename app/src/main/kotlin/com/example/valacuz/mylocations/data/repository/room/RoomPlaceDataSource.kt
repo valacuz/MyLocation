@@ -2,6 +2,7 @@ package com.example.valacuz.mylocations.data.repository.room
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.preference.PreferenceManager
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import io.reactivex.Flowable
@@ -25,7 +26,15 @@ class RoomPlaceDataSource private constructor(val context: Context) : PlaceDataS
 
     override fun addPlaces(places: List<PlaceItem>) =
             AppDatabase.getInstance(context).run {
-                placeItemDao().addPlaces(places).also { close() }
+                placeItemDao().addPlaces(places)
+                        .also { close() }
+                        .run {
+                            PreferenceManager
+                                    .getDefaultSharedPreferences(context)
+                                    .edit()
+                                    .putLong(KEY_PLACE_TICKS, System.currentTimeMillis())
+                                    .apply()
+                        }
             }
 
     override fun updatePlace(place: PlaceItem) =
@@ -43,7 +52,16 @@ class RoomPlaceDataSource private constructor(val context: Context) : PlaceDataS
                 placeItemDao().clearPlaces().also { close() }
             }
 
+    override fun isDirty(): Boolean {
+        val ticks = PreferenceManager
+                .getDefaultSharedPreferences(context)
+                .getLong(KEY_PLACE_TICKS, 0)
+        return System.currentTimeMillis() - ticks > (60 * 60 * 1_000)   // 1 Hour
+    }
+
     companion object {
+
+        private const val KEY_PLACE_TICKS = "ROOM_PLACE_TICKS"
 
         @SuppressLint("StaticFieldLeak")
         @Volatile

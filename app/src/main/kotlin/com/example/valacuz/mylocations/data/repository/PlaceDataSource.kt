@@ -4,7 +4,7 @@ import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.PlaceType
 import io.reactivex.Flowable
 
-interface PlaceDataSource {
+interface PlaceDataSource : TimingsDataSource {
 
     fun getAllPlaces(): Flowable<List<PlaceItem>>
 
