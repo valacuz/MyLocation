@@ -11,18 +11,19 @@ import android.support.v7.widget.Toolbar
 import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.ViewModelHolder
 import com.example.valacuz.mylocations.data.PlaceItem
-import com.example.valacuz.mylocations.data.repository.room.RoomPlaceDataSource
+import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.domain.display.GoogleMapDisplaySource
 import com.example.valacuz.mylocations.domain.display.MapDisplaySource
 import com.example.valacuz.mylocations.domain.share.GoogleMapShareSource
 import com.example.valacuz.mylocations.domain.share.ShareContentSource
 import com.example.valacuz.mylocations.form.PlaceFormActivity
 import com.example.valacuz.mylocations.util.DefaultScheduleStrategy
+import javax.inject.Inject
 
 class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigator {
 
-    private val VIEW_MODEL_TAG = "LIST_VM_TAG"
-    private val REQUEST_FORM = 2001
+    @Inject
+    lateinit var placeDataSource: PlaceDataSource
 
     private lateinit var viewModel: PlaceListViewModel
 
@@ -91,7 +92,7 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
                         }
                     })
         }
-        choiceDialog!!.show(supportFragmentManager, PlaceActionDialog::class.java.name)
+        choiceDialog?.show(supportFragmentManager, PlaceActionDialog::class.java.name)
     }
 
     private fun setupToolbar() {
@@ -112,9 +113,8 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
             holder.getViewModel()!!
         } else {
             // If there no ViewModel yet, create it.
-            val roomDataSource = RoomPlaceDataSource.getInstance(this)
             val scheduleStrategy = DefaultScheduleStrategy()
-            val viewModel = PlaceListViewModel(roomDataSource, scheduleStrategy)
+            val viewModel = PlaceListViewModel(placeDataSource, scheduleStrategy)
             supportFragmentManager
                     .beginTransaction()
                     .add(ViewModelHolder<PlaceListViewModel>().createContainer(viewModel),
@@ -141,5 +141,10 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
     @VisibleForTesting
     fun getCountingIdlingResource(): IdlingResource {
         return CountingIdlingResource(PlaceListActivity::class.java.name)
+    }
+
+    companion object {
+        private const val VIEW_MODEL_TAG = "LIST_VM_TAG"
+        private const val REQUEST_FORM = 2001
     }
 }

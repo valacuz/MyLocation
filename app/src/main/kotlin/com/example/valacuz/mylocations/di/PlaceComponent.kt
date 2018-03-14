@@ -6,8 +6,8 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [(NetModule::class), (PlaceTypeModule::class)])
-interface PlaceTypeComponent {
+@Component(modules = [NetModule::class, PlaceDataModule::class, PlaceTypeDataModule::class])
+interface PlaceComponent {
     fun inject(activity: PlaceListActivity)
 
     fun inject(activity: PlaceFormActivity)

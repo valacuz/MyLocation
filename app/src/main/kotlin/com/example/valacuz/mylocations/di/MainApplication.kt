@@ -4,18 +4,19 @@ import android.app.Application
 
 open class MainApplication : Application() {
 
-    lateinit var placeTypeComponent: PlaceTypeComponent
+    lateinit var placeComponent: PlaceComponent
 
     override fun onCreate() {
         super.onCreate()
 
-        placeTypeComponent = createPlaceTypeComponent()
+        placeComponent = createPlaceTypeComponent()
     }
 
-    protected open fun createPlaceTypeComponent(): PlaceTypeComponent {
-        return DaggerPlaceTypeComponent
+    protected open fun createPlaceTypeComponent(): PlaceComponent {
+        return DaggerPlaceComponent
                 .builder()
-                .placeTypeModule(PlaceTypeModule(this.applicationContext))
+                .placeDataModule(PlaceDataModule(this.applicationContext))
+                .placeTypeDataModule(PlaceTypeDataModule(this.applicationContext))
                 .netModule(NetModule("https://private-96860-valacuz.apiary-mock.com/"))
                 .build()
     }

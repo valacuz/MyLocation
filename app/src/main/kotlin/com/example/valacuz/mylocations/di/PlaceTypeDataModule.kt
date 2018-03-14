@@ -11,7 +11,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class PlaceTypeModule(private val context: Context) {
+class PlaceTypeDataModule(private val context: Context) {
 
     @Provides
     fun providePlaceType(samplePlaceService: SamplePlaceService): PlaceTypeDataSource =
