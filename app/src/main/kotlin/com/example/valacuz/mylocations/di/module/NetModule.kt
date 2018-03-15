@@ -1,4 +1,4 @@
-package com.example.valacuz.mylocations.di
+package com.example.valacuz.mylocations.di.module
 
 import com.example.valacuz.mylocations.data.repository.remote.SamplePlaceService
 import dagger.Module

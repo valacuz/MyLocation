@@ -12,9 +12,8 @@ import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.ViewModelHolder
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
-import com.example.valacuz.mylocations.domain.display.GoogleMapDisplaySource
+import com.example.valacuz.mylocations.di.MainApplication
 import com.example.valacuz.mylocations.domain.display.MapDisplaySource
-import com.example.valacuz.mylocations.domain.share.GoogleMapShareSource
 import com.example.valacuz.mylocations.domain.share.ShareContentSource
 import com.example.valacuz.mylocations.form.PlaceFormActivity
 import com.example.valacuz.mylocations.util.DefaultScheduleStrategy
@@ -25,11 +24,13 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
     @Inject
     lateinit var placeDataSource: PlaceDataSource
 
-    private lateinit var viewModel: PlaceListViewModel
-
-    // Long click menu action sources
+    @Inject
     private lateinit var mapDisplaySource: MapDisplaySource
+
+    @Inject
     private lateinit var shareContentSource: ShareContentSource
+
+    private lateinit var viewModel: PlaceListViewModel
 
     private var choiceDialog: PlaceActionDialog? = null
 
@@ -38,11 +39,10 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
         setContentView(R.layout.activity_place_list)
         setupToolbar()
 
+        (application as MainApplication).placeComponent.inject(this)
+
         viewModel = findOrCreateViewModel()
         viewModel.setNavigator(this)
-
-        mapDisplaySource = GoogleMapDisplaySource(this)
-        shareContentSource = GoogleMapShareSource(this)
 
         val fragment: PlaceListFragment = findOrCreateFragment()
         fragment.setViewModel(viewModel)
@@ -98,17 +98,14 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
     private fun setupToolbar() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-        supportActionBar?.let {
-            it.title = getString(R.string.app_name)
-        }
+        supportActionBar?.title = getString(R.string.app_name)
     }
 
     private fun findOrCreateViewModel(): PlaceListViewModel {
         @Suppress("UNCHECKED_CAST")
-        val holder: ViewModelHolder<PlaceListViewModel>? = supportFragmentManager
+        val holder = supportFragmentManager
                 .findFragmentByTag(VIEW_MODEL_TAG) as ViewModelHolder<PlaceListViewModel>?
-        return if (holder != null) {
+        return if (holder?.getViewModel() != null) {
             // If the ViewModel was retained, return it.
             holder.getViewModel()!!
         } else {
@@ -117,8 +114,8 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
             val viewModel = PlaceListViewModel(placeDataSource, scheduleStrategy)
             supportFragmentManager
                     .beginTransaction()
-                    .add(ViewModelHolder<PlaceListViewModel>().createContainer(viewModel),
-                            VIEW_MODEL_TAG)
+                    .add(ViewModelHolder<PlaceListViewModel>()
+                            .createContainer(viewModel), VIEW_MODEL_TAG)
                     .commit()
             // return view model
             viewModel

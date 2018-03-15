@@ -113,7 +113,7 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
         @Suppress("UNCHECKED_CAST")
         val holder: ViewModelHolder<PlaceFormViewModel>? = supportFragmentManager
                 .findFragmentByTag(VIEW_MODEL_TAG) as ViewModelHolder<PlaceFormViewModel>?
-        return if (holder != null) {
+        return if (holder?.getViewModel() != null) {
             // If the ViewModel was retained, return it.
             holder.getViewModel()!!
         } else {

@@ -1,4 +1,4 @@
-package com.example.valacuz.mylocations.di
+package com.example.valacuz.mylocations.di.module
 
 import android.content.Context
 import com.example.valacuz.mylocations.data.repository.CompositePlaceDataSource
