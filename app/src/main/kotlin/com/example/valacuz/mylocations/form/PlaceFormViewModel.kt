@@ -7,6 +7,7 @@ import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.PlaceType
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
+import com.example.valacuz.mylocations.util.EspressoIdlingResource
 import com.example.valacuz.mylocations.util.ScheduleStrategy
 import io.reactivex.disposables.CompositeDisposable
 
@@ -88,16 +89,30 @@ class PlaceFormViewModel(context: Context,
     private fun isNewLocation(): Boolean = placeId == null
 
     private fun populatePlaceType() {
+        // Make espresso knows that app currently busy.
+        EspressoIdlingResource.increment()
+
         val disposable = typeDataSource.getAllTypes()
                 .compose(ioSchedule.applySchedule())
-                .subscribe({ types -> placeTypes.addAll(types) })
+                .subscribe({ types ->
+                    if (!EspressoIdlingResource.getIdlingResource().isIdleNow) {
+                        EspressoIdlingResource.decrement()
+                    }
+                    placeTypes.addAll(types)
+                })
         compositeDisposable.add(disposable)
     }
 
     private fun populateItem(placeId: String) {
+        // Make espresso knows that app currently busy.
+        EspressoIdlingResource.increment()
+
         val disposable = itemDataSource.getById(placeId)
                 .compose(ioSchedule.applySchedule())
                 .subscribe({ placeItem ->
+                    if (!EspressoIdlingResource.getIdlingResource().isIdleNow) {
+                        EspressoIdlingResource.decrement()
+                    }
                     name.set(placeItem.name)
                     starred.set(placeItem.isStarred)
                     setCoordinate(placeItem.latitude, placeItem.longitude)

@@ -5,8 +5,9 @@ import android.databinding.Bindable
 import android.databinding.ObservableArrayList
 import android.databinding.ObservableList
 import com.example.valacuz.mylocations.BR
-import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.data.PlaceItem
+import com.example.valacuz.mylocations.data.repository.PlaceDataSource
+import com.example.valacuz.mylocations.util.EspressoIdlingResource
 import com.example.valacuz.mylocations.util.ScheduleStrategy
 import io.reactivex.disposables.CompositeDisposable
 
@@ -48,9 +49,15 @@ class PlaceListViewModel(private val itemDataSource: PlaceDataSource,
     }
 
     fun loadItems() {
+        // Make espresso knows that app is currently busy.
+        EspressoIdlingResource.increment()
+
         val disposable = itemDataSource.getAllPlaces()
                 .compose(scheduleStrategy.applySchedule())
                 .subscribe({ places ->
+                    if (!EspressoIdlingResource.getIdlingResource().isIdleNow) {
+                        EspressoIdlingResource.decrement()  // Set app as idle
+                    }
                     items.clear()
                     items.addAll(places)
                     notifyPropertyChanged(BR.empty) // It's a @Bindable so update manually.
