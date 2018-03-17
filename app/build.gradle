@@ -4,12 +4,13 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.3"
+    compileSdkVersion compile_sdk_version
+    buildToolsVersion build_tool_version
+
     defaultConfig {
         applicationId "com.example.valacuz.mylocations"
-        minSdkVersion 19
-        targetSdkVersion 27
+        minSdkVersion min_sdk_version
+        targetSdkVersion target_sdk_version
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -24,17 +25,34 @@ android {
         enabled true
     }
     sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
-        androidTest.java.srcDirs += 'src/androidTest/kotlin'
+        main.java.srcDirs = ['src/main/kotlin']
+        test.java.srcDirs = ['src/test/kotlin']
+        androidTest.java.srcDirs = ['src/androidTest/kotlin']
+        mock.java.srcDirs = ['src/mock/kotlin']
+        production.java.srcDirs = ['src/production/kotlin']
     }
-}
+    flavorDimensions "default"
+    productFlavors {
+        mock {
+            dimension "default"
+            applicationIdSuffix = ".mock"
+        }
+        production {
+            dimension "default"
+        }
+    }
 
-// Ensure kotlin code will not be used in production code.
-afterEvaluate {
-    android.sourceSets.all { source ->
-        if (!source.name.startsWith('test') || !source.name.startsWith('androidTest')) {
-            source.kotlin.setSrcDirs([])
+    // Remove mockRelease as it's not needed.
+    android.variantFilter { variant ->
+        if (variant.buildType.name == 'release' && variant.flavors.get(0).name == 'mock') {
+            variant.ignore = true
+        }
+    }
+
+    // Always show the result of every unit test, even if it passes.
+    testOptions.unitTests.all {
+        testLogging {
+            events 'passed', 'failed', 'skipped', 'standardOut', 'standardError'
         }
     }
 }
