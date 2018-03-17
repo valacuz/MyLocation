@@ -29,7 +29,7 @@ android {
         test.java.srcDirs = ['src/test/kotlin']
         androidTest.java.srcDirs = ['src/androidTest/kotlin']
         mock.java.srcDirs = ['src/mock/kotlin']
-        production.java.srcDirs = ['src/production/kotlin']
+        production.java.srcDirs = ['src/prod/kotlin']
     }
     flavorDimensions "default"
     productFlavors {
@@ -116,8 +116,13 @@ dependencies {
     //
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"
     androidTestImplementation "com.android.support.test:rules:$test_rule_version"
+
+    // Espresso
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso_version"
     androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$espresso_version"
     androidTestImplementation "com.android.support.test.espresso:espresso-intents:$espresso_version"
     androidTestImplementation "com.android.support.test.espresso:espresso-idling-resource:$espresso_version"
+
+    // Ui Automator
+    androidTestImplementation "com.android.support.test.uiautomator:uiautomator-v18:$ui_automator_version"
 }

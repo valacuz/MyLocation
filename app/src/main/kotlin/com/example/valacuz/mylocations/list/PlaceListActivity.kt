@@ -25,10 +25,10 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
     lateinit var placeDataSource: PlaceDataSource
 
     @Inject
-    private lateinit var mapDisplaySource: MapDisplaySource
+    lateinit var mapDisplaySource: MapDisplaySource
 
     @Inject
-    private lateinit var shareContentSource: ShareContentSource
+    lateinit var shareContentSource: ShareContentSource
 
     private lateinit var viewModel: PlaceListViewModel
 

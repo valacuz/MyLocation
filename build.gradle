@@ -23,6 +23,7 @@ buildscript {
         test_rule_version = '1.0.1'
         test_runner_version = '1.0.1'
         espresso_version = '3.0.1'
+        ui_automator_version = '2.1.1'
     }
     repositories {
         google()

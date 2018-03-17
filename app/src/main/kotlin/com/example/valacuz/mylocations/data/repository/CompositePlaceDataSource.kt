@@ -42,7 +42,7 @@ class CompositePlaceDataSource private constructor(
         }
     }
 
-    private fun getByIdFromMemory(placeId: String) = remoteSource.getById(placeId)
+    private fun getByIdFromMemory(placeId: String) = memorySource.getById(placeId)
 
     private fun getByIdFromLocal(placeId: String) = localSource.getById(placeId)
             .doOnNext({

@@ -56,7 +56,7 @@ class PlaceFormViewModel(context: Context,
         // Retrieve list of place type.
         populatePlaceType()
         // Retrieve item from given id.
-        placeId?.let { populateItem(it) }
+         placeId?.let { populateItem(it) }
     }
 
     fun onActivityDestroyed() {

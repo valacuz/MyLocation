@@ -10,7 +10,7 @@ import com.example.valacuz.mylocations.data.PlaceType
 import java.util.concurrent.Executors
 
 
-@Database(entities = [(PlaceItem::class), (PlaceType::class)], version = 1)
+@Database(entities = [PlaceItem::class, PlaceType::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun placeItemDao(): PlaceDao
@@ -30,8 +30,8 @@ abstract class AppDatabase : RoomDatabase() {
                 }
 
         private fun buildDatabase(context: Context) =
-                Room.databaseBuilder(context.applicationContext,
-                        AppDatabase::class.java, DATABASE_NAME)
+                Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME)
+                        /*
                         .addCallback(object : Callback() {
                             override fun onCreate(db: SupportSQLiteDatabase) {
                                 super.onCreate(db)
@@ -44,13 +44,15 @@ abstract class AppDatabase : RoomDatabase() {
                                 })
                             }
                         })
+                        */
                         .build()
 
+        /*
         val PRE_POPULATE_DATA = listOf(
                 PlaceType(1, "Education"),
                 PlaceType(2, "Department store"),
                 PlaceType(3, "Restaurant"),
                 PlaceType(4, "Relaxation"))
-
+        */
     }
 }
