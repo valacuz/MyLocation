@@ -16,7 +16,7 @@ import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
 import com.example.valacuz.mylocations.di.MainApplication
 import com.example.valacuz.mylocations.picker.PlacePickerActivity
-import com.example.valacuz.mylocations.util.DefaultScheduleStrategy
+import com.example.valacuz.mylocations.util.schedulers.SchedulerProvider
 import javax.inject.Inject
 
 class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
@@ -117,9 +117,9 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
             // If the ViewModel was retained, return it.
             holder.getViewModel()!!
         } else {
-            val scheduleStrategy = DefaultScheduleStrategy()
+            val schedulerProvider = SchedulerProvider()
             val viewModel = PlaceFormViewModel(this, placeDataSource, placeTypeDataSource,
-                    scheduleStrategy, mPlaceId)
+                    schedulerProvider, mPlaceId)
             supportFragmentManager
                     .beginTransaction()
                     .add(ViewModelHolder<PlaceFormViewModel>().createContainer(viewModel),

@@ -8,11 +8,11 @@ import com.example.valacuz.mylocations.BR
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.util.EspressoIdlingResource
-import com.example.valacuz.mylocations.util.ScheduleStrategy
+import com.example.valacuz.mylocations.util.schedulers.SchedulerProvider
 import io.reactivex.disposables.CompositeDisposable
 
 class PlaceListViewModel(private val itemDataSource: PlaceDataSource,
-                         private val scheduleStrategy: ScheduleStrategy) : BaseObservable() {
+                         private val schedulerProvider: SchedulerProvider) : BaseObservable() {
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -53,7 +53,8 @@ class PlaceListViewModel(private val itemDataSource: PlaceDataSource,
         EspressoIdlingResource.increment()
 
         val disposable = itemDataSource.getAllPlaces()
-                .compose(scheduleStrategy.applySchedule())
+                .observeOn(schedulerProvider.ui())
+                .subscribeOn(schedulerProvider.io())
                 .subscribe({ places ->
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow) {
                         EspressoIdlingResource.decrement()  // Set app as idle

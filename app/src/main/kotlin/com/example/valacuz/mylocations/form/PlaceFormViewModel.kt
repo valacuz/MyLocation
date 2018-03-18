@@ -3,18 +3,19 @@ package com.example.valacuz.mylocations.form
 import android.content.Context
 import android.databinding.*
 import com.example.valacuz.mylocations.R
-import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.PlaceType
+import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
 import com.example.valacuz.mylocations.util.EspressoIdlingResource
-import com.example.valacuz.mylocations.util.ScheduleStrategy
+import com.example.valacuz.mylocations.util.schedulers.SchedulerProvider
+import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 
 class PlaceFormViewModel(context: Context,
                          private val itemDataSource: PlaceDataSource,
                          private val typeDataSource: PlaceTypeDataSource,
-                         private val ioSchedule: ScheduleStrategy,
+                         private val schedulerProvider: SchedulerProvider,
                          id: String? = null)
     : BaseObservable() {
 
@@ -56,7 +57,7 @@ class PlaceFormViewModel(context: Context,
         // Retrieve list of place type.
         populatePlaceType()
         // Retrieve item from given id.
-         placeId?.let { populateItem(it) }
+        placeId?.let { populateItem(it) }
     }
 
     fun onActivityDestroyed() {
@@ -93,7 +94,8 @@ class PlaceFormViewModel(context: Context,
         EspressoIdlingResource.increment()
 
         val disposable = typeDataSource.getAllTypes()
-                .compose(ioSchedule.applySchedule())
+                .observeOn(schedulerProvider.ui())
+                .subscribeOn(schedulerProvider.io())
                 .subscribe({ types ->
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow) {
                         EspressoIdlingResource.decrement()
@@ -108,7 +110,8 @@ class PlaceFormViewModel(context: Context,
         EspressoIdlingResource.increment()
 
         val disposable = itemDataSource.getById(placeId)
-                .compose(ioSchedule.applySchedule())
+                .observeOn(schedulerProvider.ui())
+                .subscribeOn(schedulerProvider.io())
                 .subscribe({ placeItem ->
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow) {
                         EspressoIdlingResource.decrement()
@@ -130,8 +133,19 @@ class PlaceFormViewModel(context: Context,
         if (place.isEmpty()) {
             errorMessage.set(context.getString(R.string.msg_empty_name))
         } else {
-            itemDataSource.addPlace(place)
-            navigator?.goBackToList()
+            // Mark as busy
+            EspressoIdlingResource.increment()
+
+            val disposable = Completable.fromAction { itemDataSource.addPlace(place) }
+                    .observeOn(schedulerProvider.ui())
+                    .subscribeOn(schedulerProvider.io())
+                    .subscribe({
+                        if (!EspressoIdlingResource.getIdlingResource().isIdleNow) {
+                            EspressoIdlingResource.decrement()
+                        }
+                        navigator?.goBackToList()
+                    })
+            compositeDisposable.add(disposable)
         }
     }
 
@@ -142,7 +156,22 @@ class PlaceFormViewModel(context: Context,
                                isStarred: Boolean,
                                id: String) {
         val place = PlaceItem(name, latitude, longitude, type, isStarred, id)
-        itemDataSource.updatePlace(place)
-        navigator?.goBackToList()
+        if (place.isEmpty()) {
+            errorMessage.set(context.getString(R.string.msg_empty_name))
+        } else {
+            // Mark as busy
+            EspressoIdlingResource.increment()
+
+            val disposable = Completable.fromAction { itemDataSource.updatePlace(place) }
+                    .observeOn(schedulerProvider.ui())
+                    .subscribeOn(schedulerProvider.io())
+                    .subscribe({
+                        if (!EspressoIdlingResource.getIdlingResource().isIdleNow) {
+                            EspressoIdlingResource.decrement()
+                        }
+                        navigator?.goBackToList()
+                    })
+            compositeDisposable.add(disposable)
+        }
     }
 }

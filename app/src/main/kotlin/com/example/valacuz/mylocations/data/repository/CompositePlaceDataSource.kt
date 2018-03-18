@@ -56,7 +56,7 @@ class CompositePlaceDataSource private constructor(
             })
 
     override fun addPlace(place: PlaceItem) {
-        remoteSource.addPlace(place)
+//        remoteSource.addPlace(place)
         localSource.addPlace(place)
         memorySource.addPlace(place)
     }

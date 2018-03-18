@@ -18,7 +18,7 @@ class PlacePickerFragment : Fragment() {
     private lateinit var viewModel: PlacePickerViewModel
     private lateinit var fragmentBinding: FragmentPlacePickerBinding
 
-    private lateinit var googleMap: GoogleMap
+    lateinit var googleMap: GoogleMap
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,

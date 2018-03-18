@@ -16,7 +16,7 @@ import com.example.valacuz.mylocations.di.MainApplication
 import com.example.valacuz.mylocations.domain.display.MapDisplaySource
 import com.example.valacuz.mylocations.domain.share.ShareContentSource
 import com.example.valacuz.mylocations.form.PlaceFormActivity
-import com.example.valacuz.mylocations.util.DefaultScheduleStrategy
+import com.example.valacuz.mylocations.util.schedulers.SchedulerProvider
 import javax.inject.Inject
 
 class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigator {
@@ -110,8 +110,8 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
             holder.getViewModel()!!
         } else {
             // If there no ViewModel yet, create it.
-            val scheduleStrategy = DefaultScheduleStrategy()
-            val viewModel = PlaceListViewModel(placeDataSource, scheduleStrategy)
+            val schedulerProvider = SchedulerProvider()
+            val viewModel = PlaceListViewModel(placeDataSource, schedulerProvider)
             supportFragmentManager
                     .beginTransaction()
                     .add(ViewModelHolder<PlaceListViewModel>()
