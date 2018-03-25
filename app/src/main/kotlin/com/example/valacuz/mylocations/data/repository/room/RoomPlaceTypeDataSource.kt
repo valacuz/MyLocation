@@ -5,6 +5,7 @@ import android.content.Context
 import android.preference.PreferenceManager
 import com.example.valacuz.mylocations.data.PlaceType
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
+import io.reactivex.Completable
 import io.reactivex.Flowable
 
 class RoomPlaceTypeDataSource private constructor(
@@ -13,16 +14,31 @@ class RoomPlaceTypeDataSource private constructor(
 
     override fun getAllTypes(): Flowable<List<PlaceType>> = placeTypeDao.getAllTypes()
 
-    override fun addTypes(types: List<PlaceType>) =
-            placeTypeDao.addPlaceTypes(types)
-                    .run {
-                        PreferenceManager
-                                .getDefaultSharedPreferences(context)
-                                .edit()
-                                .putLong(KEY_PLACE_TYPE_TICKS, System.currentTimeMillis())
-                                .apply()
-                    }
+    override fun addTypes(types: List<PlaceType>): Completable {
+        // Clear old one
+        return clearTypes()
+                .andThen(Completable.fromAction({
+                    // Add new place types
+                    placeTypeDao.addPlaceTypes(types)
+                    // Update ticks
+                    PreferenceManager
+                            .getDefaultSharedPreferences(context)
+                            .edit()
+                            .putLong(KEY_PLACE_TYPE_TICKS, System.currentTimeMillis())
+                            .apply()
+                    // Return as complete
+                    Completable.complete()
+                }))
+    }
 
+    override fun clearTypes(): Completable {
+        return Completable.fromAction({
+            if (placeTypeDao.clearPlaceTypes() > 0)
+                Completable.complete()
+            else
+                Completable.error(Throwable("Cannot delete one or more place types"))
+        })
+    }
 
     override fun isDirty(): Boolean {
         val ticks = PreferenceManager

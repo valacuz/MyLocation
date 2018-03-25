@@ -28,4 +28,7 @@ interface SamplePlaceService {
 
     @GET("types")
     fun getPlaceTypes(): Observable<List<PlaceTypeResponse>>
+
+    @DELETE("types")
+    fun clearPlaceTypes(): Completable
 }

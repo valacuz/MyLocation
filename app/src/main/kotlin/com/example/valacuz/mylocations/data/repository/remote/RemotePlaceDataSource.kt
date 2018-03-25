@@ -55,13 +55,9 @@ class RemotePlaceDataSource private constructor(
         return samplePlaceService.updatePlace(place.id, body)
     }
 
-    override fun deletePlace(place: PlaceItem): Completable {
-        return samplePlaceService.deletePlace(place.id)
-    }
+    override fun deletePlace(place: PlaceItem): Completable = samplePlaceService.deletePlace(place.id)
 
-    override fun clearPlaces(): Completable {
-        return samplePlaceService.clearPlaces()
-    }
+    override fun clearPlaces(): Completable = samplePlaceService.clearPlaces()
 
     override fun isDirty(): Boolean = false // Never!
 

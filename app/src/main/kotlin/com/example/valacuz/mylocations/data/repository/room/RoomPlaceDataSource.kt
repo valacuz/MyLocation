@@ -25,8 +25,8 @@ class RoomPlaceDataSource private constructor(
 
     override fun addPlaces(places: List<PlaceItem>): Completable {
         // Clear old one
-        return clearPlaces().andThen(
-                Completable.fromAction({
+        return clearPlaces()
+                .andThen(Completable.fromAction({
                     // Add places
                     placeDao.addPlaces(places)
                     // Update ticks
@@ -65,7 +65,7 @@ class RoomPlaceDataSource private constructor(
             if (placeDao.clearPlaces() > 0)
                 Completable.complete()
             else
-                Completable.error(Throwable("Cannot remove one or more place."))
+                Completable.error(Throwable("Cannot delete one or more places."))
         })
     }
 

@@ -2,9 +2,10 @@ package com.example.valacuz.mylocations.data.repository.memory
 
 import com.example.valacuz.mylocations.data.PlaceType
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
+import io.reactivex.Completable
 import io.reactivex.Flowable
 
-class MemoryPlaceTypeDataSource private constructor() : PlaceTypeDataSource {
+open class MemoryPlaceTypeDataSource internal constructor() : PlaceTypeDataSource {
 
     private val items: MutableList<PlaceType> = mutableListOf()
 
@@ -12,9 +13,23 @@ class MemoryPlaceTypeDataSource private constructor() : PlaceTypeDataSource {
 
     override fun getAllTypes(): Flowable<List<PlaceType>> = Flowable.fromArray(items)
 
-    override fun addTypes(types: List<PlaceType>) {
-        items.addAll(types)
-        ticks = System.currentTimeMillis()
+    override fun addTypes(types: List<PlaceType>): Completable {
+        return clearTypes()
+                .andThen(Completable.fromAction({
+                    items.addAll(types)
+                    ticks = System.currentTimeMillis()
+                    Completable.complete()
+                }))
+    }
+
+    override fun clearTypes(): Completable {
+        return Completable.fromAction({
+            items.clear()
+            if (items.size == 0)
+                Completable.complete()
+            else
+                Completable.error(Throwable("Cannot delete one or more place types"))
+        })
     }
 
     // Check is data is dirty (default 5 minutes or when data is empty)

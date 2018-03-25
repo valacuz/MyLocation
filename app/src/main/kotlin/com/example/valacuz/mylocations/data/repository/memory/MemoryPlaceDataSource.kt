@@ -5,7 +5,7 @@ import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import io.reactivex.Completable
 import io.reactivex.Flowable
 
-class MemoryPlaceDataSource private constructor() : PlaceDataSource {
+open class MemoryPlaceDataSource internal constructor() : PlaceDataSource {
 
     private val items: MutableList<PlaceItem> = mutableListOf()
 
@@ -16,7 +16,7 @@ class MemoryPlaceDataSource private constructor() : PlaceDataSource {
     override fun getById(placeId: String): Flowable<PlaceItem> {
         val placeItem: PlaceItem? = items.firstOrNull { it.id == placeId }
         return if (placeItem == null) {
-            Flowable.empty()
+            Flowable.never()
         } else {
             Flowable.just(placeItem)
         }

@@ -1,6 +1,7 @@
 package com.example.valacuz.mylocations.data.repository
 
 import com.example.valacuz.mylocations.data.PlaceType
+import io.reactivex.Completable
 import io.reactivex.Flowable
 
 /**
@@ -33,11 +34,16 @@ class CompositePlaceTypeDataSource private constructor(
                 memorySource.addTypes(it)
             })
 
-    override fun addTypes(types: List<PlaceType>) {
-        remoteSource.addTypes(types)
-        localSource.addTypes(types)
-        memorySource.addTypes(types)
-    }
+    override fun addTypes(types: List<PlaceType>): Completable =
+            remoteSource.addTypes(types)
+                    .andThen(localSource.addTypes(types))
+                    .andThen(memorySource.addTypes(types))
+
+
+    override fun clearTypes(): Completable =
+            remoteSource.clearTypes()
+                    .andThen(localSource.clearTypes())
+                    .andThen(memorySource.clearTypes())
 
     override fun isDirty(): Boolean = false // Never!
 

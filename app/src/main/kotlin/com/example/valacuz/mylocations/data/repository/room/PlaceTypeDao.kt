@@ -15,4 +15,12 @@ interface PlaceTypeDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addPlaceTypes(types: List<PlaceType>)
+
+    /**
+     * Deletes all places in database.
+     *
+     * @return A number of places deleted.
+     */
+    @Query("DELETE FROM tbl_place_type")
+    fun clearPlaceTypes(): Int
 }

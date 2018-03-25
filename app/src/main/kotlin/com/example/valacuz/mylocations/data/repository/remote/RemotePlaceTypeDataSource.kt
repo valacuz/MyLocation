@@ -3,6 +3,7 @@ package com.example.valacuz.mylocations.data.repository.remote
 import com.example.valacuz.mylocations.data.PlaceType
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
 import io.reactivex.BackpressureStrategy
+import io.reactivex.Completable
 import io.reactivex.Flowable
 
 class RemotePlaceTypeDataSource private constructor(
@@ -17,9 +18,10 @@ class RemotePlaceTypeDataSource private constructor(
                         }
                     }).toFlowable(BackpressureStrategy.LATEST)
 
-    override fun addTypes(types: List<PlaceType>) {
-        // Operation not support on remote.
-    }
+    // Operation not support on remote.
+    override fun addTypes(types: List<PlaceType>): Completable = Completable.complete()
+
+    override fun clearTypes(): Completable = samplePlaceService.clearPlaceTypes()
 
     override fun isDirty() = false // Never!
 
