@@ -1,10 +1,13 @@
 package com.example.valacuz.mylocations.data.repository
 
 import com.example.valacuz.mylocations.data.PlaceItem
+import io.reactivex.Completable
 import io.reactivex.Flowable
 
 /**
  * This class with three source of PlaceDataSource combined.
+ *
+ * Each data source has difference
  */
 class CompositePlaceDataSource private constructor(
         private val memorySource: PlaceDataSource,
@@ -55,34 +58,34 @@ class CompositePlaceDataSource private constructor(
                 memorySource.addPlace(it)
             })
 
-    override fun addPlace(place: PlaceItem) {
-//        remoteSource.addPlace(place)
-        localSource.addPlace(place)
-        memorySource.addPlace(place)
+    override fun addPlace(place: PlaceItem): Completable {
+        return remoteSource.addPlace(place)
+                .andThen(localSource.addPlace(place))
+                .andThen(memorySource.addPlace(place))
     }
 
-    override fun addPlaces(places: List<PlaceItem>) {
-        remoteSource.addPlaces(places)
-        localSource.addPlaces(places)
-        memorySource.addPlaces(places)
+    override fun addPlaces(places: List<PlaceItem>): Completable {
+        return remoteSource.addPlaces(places)
+                .andThen(localSource.addPlaces(places))
+                .andThen(memorySource.addPlaces(places))
     }
 
-    override fun updatePlace(place: PlaceItem) {
-        remoteSource.updatePlace(place)
-        localSource.updatePlace(place)
-        memorySource.updatePlace(place)
+    override fun updatePlace(place: PlaceItem): Completable {
+        return remoteSource.updatePlace(place)
+                .andThen(localSource.updatePlace(place))
+                .andThen(memorySource.updatePlace(place))
     }
 
-    override fun deletePlace(place: PlaceItem) {
-        remoteSource.deletePlace(place)
-        localSource.deletePlace(place)
-        memorySource.deletePlace(place)
+    override fun deletePlace(place: PlaceItem): Completable {
+        return remoteSource.deletePlace(place)
+                .andThen(localSource.deletePlace(place))
+                .andThen(memorySource.deletePlace(place))
     }
 
-    override fun clearPlaces() {
-        remoteSource.clearPlaces()
-        localSource.clearPlaces()
-        memorySource.clearPlaces()
+    override fun clearPlaces(): Completable {
+        return remoteSource.clearPlaces()
+                .andThen(localSource.clearPlaces())
+                .andThen(memorySource.clearPlaces())
     }
 
     override fun isDirty(): Boolean = false // Never!

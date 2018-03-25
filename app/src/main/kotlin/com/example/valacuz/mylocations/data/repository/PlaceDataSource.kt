@@ -1,7 +1,7 @@
 package com.example.valacuz.mylocations.data.repository
 
 import com.example.valacuz.mylocations.data.PlaceItem
-import com.example.valacuz.mylocations.data.PlaceType
+import io.reactivex.Completable
 import io.reactivex.Flowable
 
 interface PlaceDataSource : TimingsDataSource {
@@ -10,13 +10,13 @@ interface PlaceDataSource : TimingsDataSource {
 
     fun getById(placeId: String): Flowable<PlaceItem>
 
-    fun addPlace(place: PlaceItem)
+    fun addPlace(place: PlaceItem): Completable
 
-    fun addPlaces(places: List<PlaceItem>)
+    fun addPlaces(places: List<PlaceItem>): Completable
 
-    fun updatePlace(place: PlaceItem)
+    fun updatePlace(place: PlaceItem): Completable
 
-    fun deletePlace(place: PlaceItem)
+    fun deletePlace(place: PlaceItem): Completable
 
-    fun clearPlaces()
+    fun clearPlaces(): Completable
 }

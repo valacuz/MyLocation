@@ -77,7 +77,7 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
 
     override fun displayItemAction(place: PlaceItem) {
         if (choiceDialog == null) {
-            choiceDialog = PlaceActionDialog.getInstance(place)
+            choiceDialog = PlaceActionDialog.getInstance()
                     .setListener(object : PlaceActionDialog.Listener {
                         override fun onShowOnMapClick(place: PlaceItem) {
                             mapDisplaySource.displayOnMap(place.latitude, place.longitude)
@@ -92,7 +92,10 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
                         }
                     })
         }
-        choiceDialog?.show(supportFragmentManager, PlaceActionDialog::class.java.name)
+        choiceDialog?.let {
+            it.setPlaceItem(place)
+            it.show(supportFragmentManager, PlaceActionDialog::class.java.name)
+        }
     }
 
     private fun setupToolbar() {

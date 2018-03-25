@@ -2,6 +2,7 @@ package com.example.valacuz.mylocations.data.repository.memory
 
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
+import io.reactivex.Completable
 import io.reactivex.Flowable
 
 class MemoryPlaceDataSource private constructor() : PlaceDataSource {
@@ -21,32 +22,59 @@ class MemoryPlaceDataSource private constructor() : PlaceDataSource {
         }
     }
 
-    override fun addPlace(place: PlaceItem) {
-        if (!items.contains(place)) {
+    override fun addPlace(place: PlaceItem): Completable {
+        return if (!items.contains(place)) {
+            val currentSize = items.size
             items.add(place)
+            // If place add successfully, new size must be higher than previous size.
+            if (items.size > currentSize)
+                Completable.complete()
+            else
+                Completable.error(Throwable("Cannot add new place."))
         } else {
-            return updatePlace(place)
+            updatePlace(place)
         }
     }
 
-    override fun addPlaces(places: List<PlaceItem>) {
+    override fun addPlaces(places: List<PlaceItem>): Completable {
+        val currentSize = items.size
+        // If place add successfully, new size must be higher than previous size.
+        items.clear()
         items.addAll(places)
         ticks = System.currentTimeMillis()
+        return if (items.size > currentSize)
+            Completable.complete()
+        else
+            Completable.error(Throwable("Cannot add new places."))
     }
 
-    override fun updatePlace(place: PlaceItem) {
+    override fun updatePlace(place: PlaceItem): Completable {
         val index = items.indexOfFirst { it.id == place.id }
-        if (index >= 0) {
+        return if (index >= 0) {
             items[index] = place
+            Completable.complete()
+        } else {
+            Completable.error(Throwable("Cannot update place."))
         }
     }
 
-    override fun deletePlace(place: PlaceItem) {
-        items.removeAll { it.id == place.id }
+    override fun deletePlace(place: PlaceItem): Completable {
+        return Completable.fromAction({
+            if (items.removeAll { it.id == place.id })
+                Completable.complete()
+            else
+                Completable.error(Throwable("Place not found."))
+        })
     }
 
-    override fun clearPlaces() {
-        items.clear()
+    override fun clearPlaces(): Completable {
+        return Completable.fromAction({
+            items.clear()
+            if (items.size == 0)    // Recheck data are removed?
+                Completable.complete()
+            else
+                Completable.error(Throwable("Cannot delete one or more places."))
+        })
     }
 
     // Check is data is dirty (default 5 minutes or when data is empty)
@@ -60,7 +88,8 @@ class MemoryPlaceDataSource private constructor() : PlaceDataSource {
 
         fun getInstance(): MemoryPlaceDataSource =
                 INSTANCE ?: synchronized(this) {
-                    INSTANCE ?: MemoryPlaceDataSource().also { INSTANCE = it }
+                    INSTANCE ?: MemoryPlaceDataSource()
+                            .also { INSTANCE = it }
                 }
     }
 }

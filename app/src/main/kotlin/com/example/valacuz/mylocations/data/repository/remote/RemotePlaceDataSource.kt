@@ -3,6 +3,7 @@ package com.example.valacuz.mylocations.data.repository.remote
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import io.reactivex.BackpressureStrategy
+import io.reactivex.Completable
 import io.reactivex.Flowable
 
 class RemotePlaceDataSource private constructor(
@@ -26,7 +27,7 @@ class RemotePlaceDataSource private constructor(
                     })
                     .toFlowable(BackpressureStrategy.LATEST)
 
-    override fun addPlace(place: PlaceItem) {
+    override fun addPlace(place: PlaceItem): Completable {
         val body = hashMapOf(
                 "place_id" to place.id,
                 "place_name" to place.name,
@@ -35,23 +36,31 @@ class RemotePlaceDataSource private constructor(
                 "longitude" to place.longitude,
                 "starred" to place.isStarred
         )
-        samplePlaceService.addPlace(body)
+        return samplePlaceService.addPlace(body)
     }
 
-    override fun addPlaces(places: List<PlaceItem>) {
+    // Operation not support on remote, so we always return complete.
+    override fun addPlaces(places: List<PlaceItem>): Completable = Completable.complete()
+
+    override fun updatePlace(place: PlaceItem): Completable {
         // Operation not support on remote.
+        val body = hashMapOf(
+                "place_id" to place.id,
+                "place_name" to place.name,
+                "place_type" to place.type,
+                "latitude" to place.latitude,
+                "longitude" to place.longitude,
+                "starred" to place.isStarred
+        )
+        return samplePlaceService.updatePlace(place.id, body)
     }
 
-    override fun updatePlace(place: PlaceItem) {
-        // Operation not support on remote.
+    override fun deletePlace(place: PlaceItem): Completable {
+        return samplePlaceService.deletePlace(place.id)
     }
 
-    override fun deletePlace(place: PlaceItem) {
-        samplePlaceService.deletePlace(place.id)
-    }
-
-    override fun clearPlaces() {
-        samplePlaceService.clearPlaces()
+    override fun clearPlaces(): Completable {
+        return samplePlaceService.clearPlaces()
     }
 
     override fun isDirty(): Boolean = false // Never!

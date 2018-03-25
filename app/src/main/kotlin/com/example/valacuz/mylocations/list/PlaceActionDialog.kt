@@ -34,7 +34,7 @@ class PlaceActionDialog : DialogFragment() {
         return dialog!!
     }
 
-    private fun setPlaceItem(place: PlaceItem): PlaceActionDialog {
+    fun setPlaceItem(place: PlaceItem): PlaceActionDialog {
         this.place = place
         return this
     }
@@ -55,9 +55,10 @@ class PlaceActionDialog : DialogFragment() {
         @Volatile
         private var INSTANCE: PlaceActionDialog? = null
 
-        fun getInstance(place: PlaceItem) =
+        fun getInstance() =
                 INSTANCE ?: synchronized(this) {
-                    INSTANCE ?: PlaceActionDialog().setPlaceItem(place)
+                    INSTANCE ?: PlaceActionDialog()
+                            .also { INSTANCE = it }
                 }
     }
 }

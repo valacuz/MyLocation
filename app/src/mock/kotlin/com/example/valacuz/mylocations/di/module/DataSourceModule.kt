@@ -30,7 +30,7 @@ class DataSourceModule(private val context: Context) {
 
     @Provides
     fun providePlaceTypeSource(placeTypeDao: PlaceTypeDao,
-                         samplePlaceService: SamplePlaceService): PlaceTypeDataSource =
+                               samplePlaceService: SamplePlaceService): PlaceTypeDataSource =
             CompositePlaceTypeDataSource.getInstance(
                     MemoryPlaceTypeDataSource.getInstance(),
                     RoomPlaceTypeDataSource.getInstance(placeTypeDao, context.applicationContext),

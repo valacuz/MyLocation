@@ -5,6 +5,7 @@ import android.content.Context
 import android.preference.PreferenceManager
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
+import io.reactivex.Completable
 import io.reactivex.Flowable
 
 class RoomPlaceDataSource private constructor(
@@ -15,23 +16,58 @@ class RoomPlaceDataSource private constructor(
 
     override fun getById(placeId: String): Flowable<PlaceItem> = placeDao.getById(placeId)
 
-    override fun addPlace(place: PlaceItem) = placeDao.addPlace(place)
+    override fun addPlace(place: PlaceItem): Completable {
+        return if (placeDao.addPlace(place) > 0)
+            Completable.complete()
+        else
+            Completable.error(Throwable("Cannot add new place."))
+    }
 
-    override fun addPlaces(places: List<PlaceItem>) =
-            placeDao.addPlaces(places)
-                    .run {
-                        PreferenceManager
-                                .getDefaultSharedPreferences(context)
-                                .edit()
-                                .putLong(KEY_PLACE_TICKS, System.currentTimeMillis())
-                                .apply()
-                    }
+    override fun addPlaces(places: List<PlaceItem>): Completable {
+        // Clear old one
+        return clearPlaces().andThen(
+                Completable.fromAction({
+                    // Add places
+                    placeDao.addPlaces(places)
+                    // Update ticks
+                    PreferenceManager
+                            .getDefaultSharedPreferences(context)
+                            .edit()
+                            .putLong(KEY_PLACE_TICKS, System.currentTimeMillis())
+                            .apply()
+                    // Return as complete
+                    Completable.complete()
+                }))
+    }
 
-    override fun updatePlace(place: PlaceItem) = placeDao.updatePlace(place)
+    override fun updatePlace(place: PlaceItem): Completable {
+        return if (placeDao.updatePlace(place) > 0)
+            Completable.complete()
+        else
+            Completable.error(Throwable("Cannot update place."))
+    }
 
-    override fun deletePlace(place: PlaceItem) = placeDao.deletePlace(place)
+    override fun deletePlace(place: PlaceItem): Completable {
+        // Here is observe thread
+        // (exception will be thrown because room database doesn't allow to working on UI thread)
 
-    override fun clearPlaces() = placeDao.clearPlaces()
+        return Completable.fromAction({
+            // Here is subscribe thread
+            if (placeDao.deletePlace(place) > 0)
+                Completable.complete()
+            else
+                Completable.error(Throwable("Place not found."))
+        })
+    }
+
+    override fun clearPlaces(): Completable {
+        return Completable.fromAction({
+            if (placeDao.clearPlaces() > 0)
+                Completable.complete()
+            else
+                Completable.error(Throwable("Cannot remove one or more place."))
+        })
+    }
 
     override fun isDirty(): Boolean {
         val ticks = PreferenceManager

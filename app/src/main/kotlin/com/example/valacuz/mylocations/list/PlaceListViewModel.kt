@@ -43,9 +43,14 @@ class PlaceListViewModel(private val itemDataSource: PlaceDataSource,
     }
 
     fun onDeletePlaceClick(place: PlaceItem) {
-        itemDataSource.deletePlace(place)
-        items.remove(place)
-        notifyPropertyChanged(BR.empty) // Update @Bindable
+        val disposable = itemDataSource.deletePlace(place)
+                .observeOn(schedulerProvider.ui())
+                .subscribeOn(schedulerProvider.io())
+                .subscribe({
+                    items.remove(place)
+                    notifyPropertyChanged(BR.empty) // Update @Bindable
+                })
+        compositeDisposable.add(disposable)
     }
 
     fun loadItems() {
