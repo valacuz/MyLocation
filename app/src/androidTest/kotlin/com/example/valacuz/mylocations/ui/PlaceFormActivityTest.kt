@@ -17,9 +17,11 @@ import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
 import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.list.PlaceListActivity
+import com.example.valacuz.mylocations.ui.actions.ViewActionUtils.Companion.waitFor
 import com.example.valacuz.mylocations.ui.matchers.MatcherUtils.Companion.withRecyclerItemText
 import org.junit.*
 import org.junit.runner.RunWith
+import kotlin.math.roundToInt
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -73,9 +75,11 @@ class PlaceFormActivityTest {
         val newPlaceName = "AFTER_PLACE"
 
         // Precondition: Given place name "BEFORE_PLACE"
-        addSuccessPlace(oldPlaceName)
-
-        // and Click on item with text "BEFORE_PLACE"
+        // If item with name "BEFORE_PLACE" is not displayed, add new place with that name
+        if (!withRecyclerItemText(oldPlaceName).matches(isDisplayed())) {
+            addSuccessPlace(oldPlaceName)
+        }
+        // and Click on item with name "BEFORE_PLACE"
         onView(withRecyclerItemText(oldPlaceName)).perform(click())
 
         // Given text "AFTER_PLACE" to replace on place name and close soft keyboard
@@ -93,14 +97,15 @@ class PlaceFormActivityTest {
 
     // Due to this case must be tested on emulator which support google play service.
     // I have to temporary ignore this case until I can setup travis ci for testing it.
-    // @Test
     @Ignore
+    @Test
     fun showMap_displayDialog() {
         val placeName = "SHOW_PLACE"
 
-        // Given item name "SHOW_PLACE" on the place list
-        addSuccessPlace(placeName)
-
+        // Given place name "SHOW_PLACE" on the place list
+        if (!withRecyclerItemText(placeName).matches(isDisplayed())) {
+            addSuccessPlace(placeName)
+        }
         // When long click on item name "SHOW_PLACE"
         onView(withRecyclerItemText(placeName)).perform(longClick())
 
@@ -115,14 +120,15 @@ class PlaceFormActivityTest {
 
     // Due to this case must be tested on emulator which support google play service.
     // I have to temporary ignore this case until I can setup travis ci for testing it.
-    // @Test
     @Ignore
+    @Test
     fun sharePlace_displayDialog() {
         val placeName = "SHARE_PLACE"
 
-        // Given item name "SHARE_PLACE" on the place list
-        addSuccessPlace(placeName)
-
+        // Given place name "SHARE_PLACE" on the place list
+        if (withRecyclerItemText(placeName).matches(isDisplayed())) {
+            addSuccessPlace(placeName)
+        }
         // When long click at that item
         onView(withRecyclerItemText(placeName)).perform(longClick())
 
@@ -139,9 +145,10 @@ class PlaceFormActivityTest {
     fun deletePlace_doesNotExist() {
         val placeName = "DELETE_PLACE"
 
-        // Given item name "DELETE_PLACE" on the place list
-        addSuccessPlace(placeName)
-
+        // Given place name "DELETE_PLACE" on the place list
+        if (withRecyclerItemText(placeName).matches(isDisplayed())) {
+            addSuccessPlace(placeName)
+        }
         // When long click at that item
         onView(withRecyclerItemText(placeName)).perform(longClick())
 
@@ -162,7 +169,34 @@ class PlaceFormActivityTest {
         // Given text "HOME" on place name and close soft keyboard
         onView(withId(R.id.text_name)).perform(typeText(placeName), closeSoftKeyboard())
 
+        randomPickLocation()
+
         // When save the place
         onView(withId(R.id.menu_action_save)).perform(click())
+    }
+
+    // Helper function which perform random swipe on google map to pick location
+    private fun randomPickLocation() {
+        onView(withId(R.id.text_coordinate)).perform(click())
+        onView(isRoot()).perform(waitFor(3000L))
+
+        // Start with current location
+        onView(withId(R.id.current_button)).perform(click())
+
+        // Swipe in random position 3 times
+        for (i in 0..3) {
+            onView(isRoot()).perform(waitFor())
+
+            val randomNumber = (Math.random() * 100).roundToInt()   // Random number for position
+            val mapViewInteraction = onView(withId(R.id.map_view))
+            when (randomNumber % 4) {
+                0 -> mapViewInteraction.perform(swipeUp())
+                1 -> mapViewInteraction.perform(swipeRight())
+                2 -> mapViewInteraction.perform(swipeDown())
+                else -> mapViewInteraction.perform(swipeLeft())
+            }
+        }
+        // Click to save position
+        onView(withId(R.id.pick_button)).perform(click())
     }
 }
