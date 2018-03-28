@@ -69,10 +69,10 @@ class PlaceFormViewModel(context: Context,
 
     fun saveButtonClick() {
         if (isNewLocation()) {
-            addLocation(name.get(), selectedType.get().id,
+            addLocation(name.get(), selectedType.get()!!.id,
                     latitude.get(), longitude.get(), starred.get())
         } else {
-            updateLocation(name.get(), selectedType.get().id,
+            updateLocation(name.get()!!, selectedType.get()!!.id,
                     latitude.get(), longitude.get(), starred.get(), placeId!!)
         }
     }

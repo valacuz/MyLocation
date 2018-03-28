@@ -17,16 +17,19 @@ class RoomPlaceDataSource private constructor(
     override fun getById(placeId: String): Flowable<PlaceItem> = placeDao.getById(placeId)
 
     override fun addPlace(place: PlaceItem): Completable {
-        return if (placeDao.addPlace(place) > 0)
-            Completable.complete()
-        else
-            Completable.error(Throwable("Cannot add new place."))
+        return Completable.defer {
+            if (placeDao.addPlace(place) > 0) {
+                Completable.complete()
+            } else {
+                Completable.error(Throwable("Cannot add new place."))
+            }
+        }
     }
 
     override fun addPlaces(places: List<PlaceItem>): Completable {
         // Clear old one
         return clearPlaces()
-                .andThen(Completable.fromAction({
+                .andThen(Completable.defer {
                     // Add places
                     placeDao.addPlaces(places)
                     // Update ticks
@@ -37,36 +40,40 @@ class RoomPlaceDataSource private constructor(
                             .apply()
                     // Return as complete
                     Completable.complete()
-                }))
+                })
     }
 
     override fun updatePlace(place: PlaceItem): Completable {
-        return if (placeDao.updatePlace(place) > 0)
-            Completable.complete()
-        else
-            Completable.error(Throwable("Cannot update place."))
+        return Completable.defer {
+            if (placeDao.updatePlace(place) > 0) {
+                Completable.complete()
+            } else {
+                Completable.error(Throwable("Cannot update place."))
+            }
+        }
     }
 
     override fun deletePlace(place: PlaceItem): Completable {
         // Here is observe thread
         // (exception will be thrown because room database doesn't allow to working on UI thread)
-
-        return Completable.fromAction({
+        return Completable.defer {
             // Here is subscribe thread
-            if (placeDao.deletePlace(place) > 0)
+            if (placeDao.deletePlace(place) > 0) {
                 Completable.complete()
-            else
+            } else {
                 Completable.error(Throwable("Place not found."))
-        })
+            }
+        }
     }
 
     override fun clearPlaces(): Completable {
-        return Completable.fromAction({
-            if (placeDao.clearPlaces() > 0)
+        return Completable.defer {
+            if (placeDao.clearPlaces() > 0) {
                 Completable.complete()
-            else
+            } else {
                 Completable.error(Throwable("Cannot delete one or more places."))
-        })
+            }
+        }
     }
 
     override fun isDirty(): Boolean {

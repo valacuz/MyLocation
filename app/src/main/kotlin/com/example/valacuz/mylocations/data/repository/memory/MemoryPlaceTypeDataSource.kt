@@ -11,25 +11,29 @@ open class MemoryPlaceTypeDataSource internal constructor() : PlaceTypeDataSourc
 
     private var ticks: Long = 0
 
+    protected fun initializeTypes(vararg types: PlaceType) {
+        items.addAll(types)
+    }
+
     override fun getAllTypes(): Flowable<List<PlaceType>> = Flowable.fromArray(items)
 
     override fun addTypes(types: List<PlaceType>): Completable {
-        return clearTypes()
-                .andThen(Completable.fromAction({
-                    items.addAll(types)
-                    ticks = System.currentTimeMillis()
-                    Completable.complete()
-                }))
+        return Completable.defer {
+            items.clear()
+            items.addAll(types)
+            ticks = System.currentTimeMillis()
+            Completable.complete()
+        }
     }
 
     override fun clearTypes(): Completable {
-        return Completable.fromAction({
+        return Completable.defer {
             items.clear()
-            if (items.size == 0)
+            if (items.isEmpty())
                 Completable.complete()
             else
                 Completable.error(Throwable("Cannot delete one or more place types"))
-        })
+        }
     }
 
     // Check is data is dirty (default 5 minutes or when data is empty)

@@ -17,7 +17,7 @@ class RoomPlaceTypeDataSource private constructor(
     override fun addTypes(types: List<PlaceType>): Completable {
         // Clear old one
         return clearTypes()
-                .andThen(Completable.fromAction({
+                .andThen(Completable.defer {
                     // Add new place types
                     placeTypeDao.addPlaceTypes(types)
                     // Update ticks
@@ -28,16 +28,16 @@ class RoomPlaceTypeDataSource private constructor(
                             .apply()
                     // Return as complete
                     Completable.complete()
-                }))
+                })
     }
 
     override fun clearTypes(): Completable {
-        return Completable.fromAction({
+        return Completable.defer {
             if (placeTypeDao.clearPlaceTypes() > 0)
                 Completable.complete()
             else
                 Completable.error(Throwable("Cannot delete one or more place types"))
-        })
+        }
     }
 
     override fun isDirty(): Boolean {

@@ -5,15 +5,14 @@ import com.example.valacuz.mylocations.data.repository.memory.MemoryPlaceTypeDat
 
 class MockPlaceTypeDataSource private constructor() : MemoryPlaceTypeDataSource() {
 
-    private val items = mutableListOf(
-            PlaceType(1, "Education"),
-            PlaceType(2, "Department store"),
-            PlaceType(3, "Restaurant"),
-            PlaceType(4, "Relaxation"))
-
     init {
         // I want the same logic as MemoryPlaceTypeDataSource but I'm lazy to create new one.
-        addTypes(items)
+        initializeTypes(
+                PlaceType(1, "Education"),
+                PlaceType(2, "Department store"),
+                PlaceType(3, "Restaurant"),
+                PlaceType(4, "Relaxation")
+        )
     }
 
     override fun isDirty(): Boolean = false // Never
