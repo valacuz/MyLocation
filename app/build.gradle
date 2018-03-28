@@ -4,12 +4,13 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    compileSdkVersion compile_sdk_version
+    buildToolsVersion build_tool_version
+
     defaultConfig {
         applicationId "com.example.valacuz.mylocations"
-        minSdkVersion 19
-        targetSdkVersion 26
+        minSdkVersion min_sdk_version
+        targetSdkVersion target_sdk_version
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -24,19 +25,40 @@ android {
         enabled true
     }
     sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
-        androidTest.java.srcDirs += 'src/androidTest/kotlin'
+        main.java.srcDirs = ['src/main/kotlin']
+        test.java.srcDirs = ['src/test/kotlin']
+        androidTest.java.srcDirs = ['src/androidTest/kotlin']
+        mock.java.srcDirs = ['src/mock/kotlin']
+        production.java.srcDirs = ['src/prod/kotlin']
+    }
+    flavorDimensions "default"
+    productFlavors {
+        mock {
+            dimension "default"
+            applicationIdSuffix = ".mock"
+        }
+        production {
+            dimension "default"
+        }
+    }
+
+    // Remove mockRelease as it's not needed.
+    android.variantFilter { variant ->
+        if (variant.buildType.name == 'release' && variant.flavors.get(0).name == 'mock') {
+            variant.ignore = true
+        }
+    }
+
+    // Always show the result of every unit test, even if it passes.
+    testOptions.unitTests.all {
+        testLogging {
+            events 'passed', 'failed', 'skipped', 'standardOut', 'standardError'
+        }
     }
 }
 
-// Ensure kotlin code will not be used in production code.
-afterEvaluate {
-    android.sourceSets.all { source ->
-        if (!source.name.startsWith('test') || !source.name.startsWith('androidTest')) {
-            source.kotlin.setSrcDirs([])
-        }
-    }
+kapt {
+    generateStubs = true
 }
 
 dependencies {
@@ -54,6 +76,14 @@ dependencies {
     implementation "com.google.android.gms:play-services-maps:$google_play_version"
     implementation "com.google.android.gms:play-services-location:$google_play_version"
 
+    // GSON
+    implementation "com.google.code.gson:gson:$gson_version"
+
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
+
     // RxJava2
     implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlin_version"
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
@@ -63,6 +93,12 @@ dependencies {
 
     // Espresso
     implementation "com.android.support.test.espresso:espresso-idling-resource:$espresso_version"
+
+    // Dagger2
+    implementation "com.google.dagger:dagger-android:$dagger_version"
+    implementation "com.google.dagger:dagger-android-support:$dagger_version"
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+    kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
     // Room persistence
     kapt "android.arch.persistence.room:compiler:$android_component_version"
@@ -80,8 +116,13 @@ dependencies {
     //
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"
     androidTestImplementation "com.android.support.test:rules:$test_rule_version"
+
+    // Espresso
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$espresso_version"
     androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$espresso_version"
     androidTestImplementation "com.android.support.test.espresso:espresso-intents:$espresso_version"
     androidTestImplementation "com.android.support.test.espresso:espresso-idling-resource:$espresso_version"
+
+    // Ui Automator
+//    androidTestImplementation "com.android.support.test.uiautomator:uiautomator-v18:$ui_automator_version"
 }

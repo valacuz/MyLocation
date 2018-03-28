@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Looper
 import android.support.v4.content.ContextCompat
-import com.example.valacuz.mylocations.data.LocationProviderSource
 import com.google.android.gms.location.*
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -52,6 +51,7 @@ class FusedLocationSource private constructor(context: Context) : LocationProvid
         fun getInstance(context: Context): FusedLocationSource =
                 INSTANCE ?: synchronized(this) {
                     INSTANCE ?: FusedLocationSource(context.applicationContext)
+                            .also { INSTANCE = it }
                 }
     }
 }

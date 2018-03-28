@@ -2,24 +2,30 @@ package com.example.valacuz.mylocations.form
 
 import android.app.Activity
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.annotation.VisibleForTesting
 import android.support.test.espresso.IdlingResource
 import android.support.test.espresso.idling.CountingIdlingResource
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.ViewModelHolder
-import com.example.valacuz.mylocations.data.PlaceDataSource
-import com.example.valacuz.mylocations.data.repository.MemoryPlaceDataSource
+import com.example.valacuz.mylocations.data.repository.PlaceDataSource
+import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
+import com.example.valacuz.mylocations.di.MainApplication
 import com.example.valacuz.mylocations.picker.PlacePickerActivity
+import com.example.valacuz.mylocations.util.schedulers.SchedulerProvider
+import javax.inject.Inject
 
 class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
 
-    private val VIEW_MODEL_TAG = "FORM_VM_TAG"
-    private val REQUEST_PICK_LOCATION = 1001
+    @Inject
+    lateinit var placeDataSource: PlaceDataSource
+
+    @Inject
+    lateinit var placeTypeDataSource: PlaceTypeDataSource
 
     private lateinit var mViewModel: PlaceFormViewModel
 
@@ -28,6 +34,8 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_place_form)
+
+        (application as MainApplication).placeComponent.inject(this)
 
         mPlaceId = intent?.extras?.getString("PLACE_ID")
         setupToolbar()
@@ -105,12 +113,13 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
         @Suppress("UNCHECKED_CAST")
         val holder: ViewModelHolder<PlaceFormViewModel>? = supportFragmentManager
                 .findFragmentByTag(VIEW_MODEL_TAG) as ViewModelHolder<PlaceFormViewModel>?
-        return if (holder != null) {
+        return if (holder?.getViewModel() != null) {
             // If the ViewModel was retained, return it.
             holder.getViewModel()!!
         } else {
-            val itemDataSource: PlaceDataSource = MemoryPlaceDataSource.getInstance()
-            val viewModel = PlaceFormViewModel(this, itemDataSource, mPlaceId)
+            val schedulerProvider = SchedulerProvider()
+            val viewModel = PlaceFormViewModel(this, placeDataSource, placeTypeDataSource,
+                    schedulerProvider, mPlaceId)
             supportFragmentManager
                     .beginTransaction()
                     .add(ViewModelHolder<PlaceFormViewModel>().createContainer(viewModel),
@@ -137,5 +146,10 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
     @VisibleForTesting
     fun getCountingIdlingResource(): IdlingResource {
         return CountingIdlingResource(PlaceFormActivity::class.java.name)
+    }
+
+    companion object {
+        private const val VIEW_MODEL_TAG = "FORM_VM_TAG"
+        private const val REQUEST_PICK_LOCATION = 1001
     }
 }

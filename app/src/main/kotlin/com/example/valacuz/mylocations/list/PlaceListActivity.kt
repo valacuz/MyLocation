@@ -10,25 +10,27 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.ViewModelHolder
-import com.example.valacuz.mylocations.data.PlaceDataSource
 import com.example.valacuz.mylocations.data.PlaceItem
-import com.example.valacuz.mylocations.data.repository.MemoryPlaceDataSource
-import com.example.valacuz.mylocations.form.PlaceFormActivity
-import com.example.valacuz.mylocations.domain.display.GoogleMapDisplaySource
+import com.example.valacuz.mylocations.data.repository.PlaceDataSource
+import com.example.valacuz.mylocations.di.MainApplication
 import com.example.valacuz.mylocations.domain.display.MapDisplaySource
-import com.example.valacuz.mylocations.domain.share.GoogleMapShareSource
 import com.example.valacuz.mylocations.domain.share.ShareContentSource
+import com.example.valacuz.mylocations.form.PlaceFormActivity
+import com.example.valacuz.mylocations.util.schedulers.SchedulerProvider
+import javax.inject.Inject
 
 class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigator {
 
-    private val VIEW_MODEL_TAG = "LIST_VM_TAG"
-    private val REQUEST_FORM = 2001
+    @Inject
+    lateinit var placeDataSource: PlaceDataSource
+
+    @Inject
+    lateinit var mapDisplaySource: MapDisplaySource
+
+    @Inject
+    lateinit var shareContentSource: ShareContentSource
 
     private lateinit var viewModel: PlaceListViewModel
-
-    // Long click menu action sources
-    private lateinit var mapDisplaySource: MapDisplaySource
-    private lateinit var shareContentSource: ShareContentSource
 
     private var choiceDialog: PlaceActionDialog? = null
 
@@ -37,11 +39,10 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
         setContentView(R.layout.activity_place_list)
         setupToolbar()
 
+        (application as MainApplication).placeComponent.inject(this)
+
         viewModel = findOrCreateViewModel()
         viewModel.setNavigator(this)
-
-        mapDisplaySource = GoogleMapDisplaySource(this)
-        shareContentSource = GoogleMapShareSource(this)
 
         val fragment: PlaceListFragment = findOrCreateFragment()
         fragment.setViewModel(viewModel)
@@ -76,7 +77,7 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
 
     override fun displayItemAction(place: PlaceItem) {
         if (choiceDialog == null) {
-            choiceDialog = PlaceActionDialog.getInstance(place)
+            choiceDialog = PlaceActionDialog.getInstance()
                     .setListener(object : PlaceActionDialog.Listener {
                         override fun onShowOnMapClick(place: PlaceItem) {
                             mapDisplaySource.displayOnMap(place.latitude, place.longitude)
@@ -91,33 +92,33 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
                         }
                     })
         }
-        choiceDialog!!.show(supportFragmentManager, PlaceActionDialog::class.java.name)
+        choiceDialog?.let {
+            it.setPlaceItem(place)
+            it.show(supportFragmentManager, PlaceActionDialog::class.java.name)
+        }
     }
 
     private fun setupToolbar() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-        supportActionBar?.let {
-            it.title = getString(R.string.app_name)
-        }
+        supportActionBar?.title = getString(R.string.app_name)
     }
 
     private fun findOrCreateViewModel(): PlaceListViewModel {
         @Suppress("UNCHECKED_CAST")
-        val holder: ViewModelHolder<PlaceListViewModel>? = supportFragmentManager
+        val holder = supportFragmentManager
                 .findFragmentByTag(VIEW_MODEL_TAG) as ViewModelHolder<PlaceListViewModel>?
-        return if (holder != null) {
+        return if (holder?.getViewModel() != null) {
             // If the ViewModel was retained, return it.
             holder.getViewModel()!!
         } else {
             // If there no ViewModel yet, create it.
-            val itemDataSource: PlaceDataSource = MemoryPlaceDataSource.getInstance()
-            val viewModel = PlaceListViewModel(itemDataSource)
+            val schedulerProvider = SchedulerProvider()
+            val viewModel = PlaceListViewModel(placeDataSource, schedulerProvider)
             supportFragmentManager
                     .beginTransaction()
-                    .add(ViewModelHolder<PlaceListViewModel>().createContainer(viewModel),
-                            VIEW_MODEL_TAG)
+                    .add(ViewModelHolder<PlaceListViewModel>()
+                            .createContainer(viewModel), VIEW_MODEL_TAG)
                     .commit()
             // return view model
             viewModel
@@ -140,5 +141,10 @@ class PlaceListActivity : AppCompatActivity(), PlaceNavigator, PlaceItemNavigato
     @VisibleForTesting
     fun getCountingIdlingResource(): IdlingResource {
         return CountingIdlingResource(PlaceListActivity::class.java.name)
+    }
+
+    companion object {
+        private const val VIEW_MODEL_TAG = "LIST_VM_TAG"
+        private const val REQUEST_FORM = 2001
     }
 }

@@ -1,4 +1,4 @@
-package com.example.valacuz.mylocations.data
+package com.example.valacuz.mylocations.data.repository
 
 import android.location.Location
 import io.reactivex.Observable

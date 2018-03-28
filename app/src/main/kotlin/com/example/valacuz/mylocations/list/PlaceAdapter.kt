@@ -20,9 +20,9 @@ class PlaceAdapter :
         holder.bindViewModel(item)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): LocationViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocationViewHolder {
         val binding = PlaceItemBinding.inflate(
-                LayoutInflater.from(parent!!.context), parent, false)
+                LayoutInflater.from(parent.context), parent, false)
         return LocationViewHolder(binding, itemNavigator)
     }
 

@@ -11,19 +11,19 @@ import org.hamcrest.TypeSafeMatcher
 class MatcherUtils {
 
     companion object {
-        fun withRecyclerItemText(itemText: String): Matcher<View> {
-            return object : TypeSafeMatcher<View>() {
-                override fun matchesSafely(item: View?): Boolean {
-                    return allOf(
-                            isDescendantOfA(isAssignableFrom(RecyclerView::class.java)),
-                            withText(itemText))
-                            .matches(item)
-                }
 
-                override fun describeTo(description: Description?) {
-                    description?.appendText("is isDescendantOfA RecyclerView with text " + itemText)
+        fun withRecyclerItemText(itemText: String): Matcher<View> =
+                object : TypeSafeMatcher<View>() {
+                    override fun matchesSafely(item: View?): Boolean {
+                        return allOf(
+                                isDescendantOfA(isAssignableFrom(RecyclerView::class.java)),
+                                withText(itemText))
+                                .matches(item)
+                    }
+
+                    override fun describeTo(description: Description?) {
+                        description?.appendText("is isDescendantOfA RecyclerView with text $itemText")
+                    }
                 }
-            }
-        }
     }
 }
