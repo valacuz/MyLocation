@@ -2,6 +2,7 @@ package com.example.valacuz.mylocations.data.repository.remote
 
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
+import com.example.valacuz.mylocations.extension.toPlaceItem
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -12,19 +13,15 @@ class RemotePlaceDataSource private constructor(
     override fun getAllPlaces(): Flowable<List<PlaceItem>> =
             samplePlaceService
                     .getPlaces()
-                    .map({ responseItems: List<PlaceResponse> ->
-                        responseItems.map {
-                            PlaceItem(it.name, it.latitude, it.longitude, it.type, it.starred, it.id)
-                        }
-                    })
+                    .map { items: List<PlaceResponse> ->
+                        items.map { it.toPlaceItem() }
+                    }
                     .toFlowable(BackpressureStrategy.LATEST)
 
     override fun getById(placeId: String): Flowable<PlaceItem> =
             samplePlaceService
                     .getPlace(placeId)
-                    .map({ item: PlaceResponse ->
-                        PlaceItem(item.name, item.latitude, item.longitude, item.type, item.starred, item.id)
-                    })
+                    .map { it.toPlaceItem() }
                     .toFlowable(BackpressureStrategy.LATEST)
 
     override fun addPlace(place: PlaceItem): Completable {

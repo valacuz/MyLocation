@@ -2,7 +2,6 @@ package com.example.valacuz.mylocations.data.repository.room
 
 import android.arch.persistence.room.*
 import android.arch.persistence.room.OnConflictStrategy.REPLACE
-import com.example.valacuz.mylocations.data.PlaceItem
 import io.reactivex.Flowable
 
 @Dao
@@ -11,19 +10,19 @@ interface PlaceDao {
     /**
      * Retrieve all places from database.
      *
-     * @return A list of [PlaceItem].
+     * @return A list of [RoomPlaceItem].
      */
     @Query("SELECT * FROM tbl_place")
-    fun getAllPlaces(): Flowable<List<PlaceItem>>
+    fun getAllPlaces(): Flowable<List<RoomPlaceItem>>
 
     /**
      * Retrieve place from given id.
      *
      * @param placeId Place id to be retrieved.
-     * @return A [PlaceItem]
+     * @return A [RoomPlaceItem]
      */
     @Query("SELECT * FROM tbl_place WHERE place_id = :placeId")
-    fun getById(placeId: String): Flowable<PlaceItem>
+    fun getById(placeId: String): Flowable<RoomPlaceItem>
 
     /**
      * Add a new place.
@@ -31,7 +30,7 @@ interface PlaceDao {
      * @param placeItem A place to be added.
      */
     @Insert(onConflict = REPLACE)
-    fun addPlace(placeItem: PlaceItem): Long
+    fun addPlace(placeItem: RoomPlaceItem): Long
 
     /**
      * Add a list of places.
@@ -39,7 +38,7 @@ interface PlaceDao {
      * @param places A list of places to be added.
      */
     @Insert(onConflict = REPLACE)
-    fun addPlaces(places: List<PlaceItem>)
+    fun addPlaces(places: List<RoomPlaceItem>)
 
     /**
      * Update place from given place. (the place is identified by its id)
@@ -47,7 +46,7 @@ interface PlaceDao {
      * @param placeItem Place to be updated.
      */
     @Update(onConflict = REPLACE)
-    fun updatePlace(placeItem: PlaceItem): Int
+    fun updatePlace(placeItem: RoomPlaceItem): Int
 
     /**
      * Delete places from given place.
@@ -56,7 +55,7 @@ interface PlaceDao {
      * @return A number of place deleted, This should be [1]
      */
     @Delete
-    fun deletePlace(placeItem: PlaceItem): Int
+    fun deletePlace(placeItem: RoomPlaceItem): Int
 
     /**
      * Deletes all places in database.
