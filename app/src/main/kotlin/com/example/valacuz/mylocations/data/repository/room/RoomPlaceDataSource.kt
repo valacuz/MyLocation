@@ -17,9 +17,7 @@ class RoomPlaceDataSource private constructor(
     override fun getAllPlaces(): Flowable<List<PlaceItem>> {
         return placeDao.getAllPlaces()
                 .map { items: List<RoomPlaceItem> ->
-                    items.map {
-                        it.toPlaceItem()
-                    }
+                    items.map { it.toPlaceItem() }
                 }
     }
 

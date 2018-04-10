@@ -5,6 +5,8 @@ import android.content.Context
 import android.preference.PreferenceManager
 import com.example.valacuz.mylocations.data.PlaceType
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
+import com.example.valacuz.mylocations.extension.toPlaceType
+import com.example.valacuz.mylocations.extension.toRoomPlaceType
 import io.reactivex.Completable
 import io.reactivex.Flowable
 
@@ -12,14 +14,20 @@ class RoomPlaceTypeDataSource private constructor(
         private val placeTypeDao: PlaceTypeDao,
         private val context: Context) : PlaceTypeDataSource {
 
-    override fun getAllTypes(): Flowable<List<PlaceType>> = placeTypeDao.getAllTypes()
+    override fun getAllTypes(): Flowable<List<PlaceType>> {
+        return placeTypeDao.getAllTypes()
+                .map { items: List<RoomPlaceType> ->
+                    items.map { it.toPlaceType() }
+                }
+    }
 
     override fun addTypes(types: List<PlaceType>): Completable {
         // Clear old one
         return clearTypes()
                 .andThen(Completable.defer {
                     // Add new place types
-                    placeTypeDao.addPlaceTypes(types)
+                    val roomTypes = types.map { it.toRoomPlaceType() }
+                    placeTypeDao.addPlaceTypes(roomTypes)
                     // Update ticks
                     PreferenceManager
                             .getDefaultSharedPreferences(context)

@@ -4,9 +4,8 @@ import android.arch.persistence.room.Database
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
 import android.content.Context
-import com.example.valacuz.mylocations.data.PlaceType
 
-@Database(entities = [RoomPlaceItem::class, PlaceType::class], version = 1)
+@Database(entities = [RoomPlaceItem::class, RoomPlaceType::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun placeItemDao(): PlaceDao
