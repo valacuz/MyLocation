@@ -44,11 +44,7 @@ class RoomPlaceDataSource private constructor(
                     val roomPlaces = places.map { it.toRoomPlace() }
                     placeDao.addPlaces(roomPlaces)
                     // Update ticks
-                    PreferenceManager
-                            .getDefaultSharedPreferences(context)
-                            .edit()
-                            .putLong(KEY_PLACE_TICKS, System.currentTimeMillis())
-                            .apply()
+                    updateTicks()
                     // Return as complete
                     Completable.complete()
                 })
@@ -92,6 +88,14 @@ class RoomPlaceDataSource private constructor(
                 .getDefaultSharedPreferences(context)
                 .getLong(KEY_PLACE_TICKS, 0)
         return System.currentTimeMillis() - ticks > (60 * 60 * 1_000)   // 1 Hour
+    }
+
+    private fun updateTicks() {
+        PreferenceManager
+                .getDefaultSharedPreferences(context)
+                .edit()
+                .putLong(KEY_PLACE_TICKS, System.currentTimeMillis())
+                .apply()
     }
 
     companion object {

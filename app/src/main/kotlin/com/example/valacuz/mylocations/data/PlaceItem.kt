@@ -9,12 +9,13 @@ import java.util.*
  *
  * But a trade-off is I have to create a lot of entity classes to handle each library.
  */
-data class PlaceItem constructor(var name: String?,
-                                 var latitude: Double,
-                                 var longitude: Double,
-                                 var type: Int,
-                                 var isStarred: Boolean = false,
-                                 var id: String = UUID.randomUUID().toString()) {
+data class PlaceItem(
+        val name: String?,
+        val latitude: Double,
+        val longitude: Double,
+        val type: Int,
+        val isStarred: Boolean = false,
+        val id: String = UUID.randomUUID().toString()) {
 
     fun isEmpty(): Boolean = name.isNullOrEmpty()
 }
