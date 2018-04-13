@@ -15,21 +15,24 @@ class RealmPlaceTypeDataSource private constructor(
         private val context: Context) : PlaceTypeDataSource {
 
     override fun getAllTypes(): Flowable<List<PlaceType>> {
-        Realm.getDefaultInstance().use {
-            return Flowable.just(it.where(RealmPlaceType::class.java)
-                    .findAll()
-                    .map { items ->
-                        items.toPlaceType()
-                    })
-        }
+        return Flowable.just(
+                Realm.getDefaultInstance().use {
+                    it.where(RealmPlaceType::class.java)
+                            .findAll()
+                            .map { items ->
+                                items.toPlaceType()
+                            }
+                })
     }
 
     override fun addTypes(types: List<PlaceType>): Completable {
-        Realm.getDefaultInstance().use {
-            return Completable.defer {
+        return Completable.defer {
+            Realm.getDefaultInstance().use {
+                it.beginTransaction()
                 it.insertOrUpdate(types.map { type: PlaceType ->
                     type.toRealmPlaceType()
                 })
+                it.commitTransaction()
                 // Update ticks
                 updateTicks()
                 // Return as complete
@@ -39,8 +42,8 @@ class RealmPlaceTypeDataSource private constructor(
     }
 
     override fun clearTypes(): Completable {
-        Realm.getDefaultInstance().use {
-            return Completable.defer {
+        return Completable.defer {
+            Realm.getDefaultInstance().use {
                 val items = it.where(RealmPlaceType::class.java).findAll()
                 if (items.isNotEmpty() && items.deleteAllFromRealm()) {
                     Completable.complete()

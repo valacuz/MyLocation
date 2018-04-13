@@ -20,6 +20,7 @@ buildscript {
         rxkotlin_version = '2.1.0'
         rxandroid_version = '2.0.1'
         realm_version = '5.0.1'
+        realm_field_helper_version = '1.1.1'
 
         test_rule_version = '1.0.1'
         test_runner_version = '1.0.1'

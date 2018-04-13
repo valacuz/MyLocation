@@ -5,6 +5,8 @@ import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
 import com.example.valacuz.mylocations.data.repository.mock.MockPlaceDataSource
 import com.example.valacuz.mylocations.data.repository.mock.MockPlaceTypeDataSource
+import com.example.valacuz.mylocations.data.repository.realm.RealmPlaceDataSource
+import com.example.valacuz.mylocations.data.repository.realm.RealmPlaceTypeDataSource
 import dagger.Module
 import dagger.Provides
 
@@ -12,7 +14,7 @@ import dagger.Provides
 class DataSourceModule(private val context: Context) {
 
     @Provides
-    fun providePlaceDataSource(): PlaceDataSource = MockPlaceDataSource.getInstance()
+    fun providePlaceDataSource(): PlaceDataSource = RealmPlaceDataSource.getInstance(context)
 
     @Provides
     fun providePlaceTypeSource(): PlaceTypeDataSource = MockPlaceTypeDataSource.getInstance()
