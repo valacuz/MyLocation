@@ -8,7 +8,7 @@ interface PlaceTypeDataSource : TimingsDataSource {
 
     fun getAllTypes(): Flowable<List<PlaceType>>
 
-    fun addTypes(types: List<PlaceType>): Completable
+    fun addTypes(types: List<PlaceType>)
 
-    fun clearTypes(): Completable
+    fun clearTypes()
 }

@@ -9,6 +9,7 @@ import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
 import com.example.valacuz.mylocations.util.EspressoIdlingResource
 import com.example.valacuz.mylocations.util.schedulers.SchedulerProvider
+import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 
 class PlaceFormViewModel(context: Context,
@@ -135,7 +136,7 @@ class PlaceFormViewModel(context: Context,
             // Mark as busy
             EspressoIdlingResource.increment()
 
-            val disposable = itemDataSource.addPlace(place)
+            val disposable = Completable.fromAction { itemDataSource.addPlace(place) }
                     .observeOn(schedulerProvider.ui())
                     .subscribeOn(schedulerProvider.io())
                     .subscribe({
@@ -161,7 +162,7 @@ class PlaceFormViewModel(context: Context,
             // Mark as busy
             EspressoIdlingResource.increment()
 
-            val disposable = itemDataSource.updatePlace(place)
+            val disposable = Completable.fromAction { itemDataSource.updatePlace(place) }
                     .observeOn(schedulerProvider.ui())
                     .subscribeOn(schedulerProvider.io())
                     .subscribe({

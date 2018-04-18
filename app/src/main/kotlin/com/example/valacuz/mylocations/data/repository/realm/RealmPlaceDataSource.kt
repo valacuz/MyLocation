@@ -7,7 +7,6 @@ import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.extension.toPlaceItem
 import com.example.valacuz.mylocations.extension.toRealmPlace
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.realm.Realm
 
@@ -15,94 +14,98 @@ class RealmPlaceDataSource private constructor(
         private val context: Context) : PlaceDataSource {
 
     override fun getAllPlaces(): Flowable<List<PlaceItem>> {
-        return Flowable.just(
-                Realm.getDefaultInstance().use {
-                    it.where(RealmPlaceItem::class.java)
-                            .findAll()
-                            .map { items ->
-                                items.toPlaceItem()
-                            }
-                })
-    }
-
-    override fun getById(placeId: String): Flowable<PlaceItem> {
-        return Flowable.just(
-                Realm.getDefaultInstance().use {
-                    it.where(RealmPlaceItem::class.java)
-                            .equalTo(RealmPlaceItemFields.ID, placeId)
-                            .findFirst()
-                            ?.toPlaceItem()
-                })
-    }
-
-    override fun addPlace(place: PlaceItem): Completable {
-        return Completable.defer {
+        return Flowable.defer {
             Realm.getDefaultInstance().use {
-                it.beginTransaction()
-                it.insertOrUpdate(place.toRealmPlace())
-                it.commitTransaction()
-                //
-                Completable.complete()
-            }
-        }
-    }
-
-    override fun addPlaces(places: List<PlaceItem>): Completable {
-        return Completable.defer {
-            Realm.getDefaultInstance().use {
-                it.beginTransaction()
-                it.insertOrUpdate(places.map { place: PlaceItem ->
-                    place.toRealmPlace()
-                })
-                it.commitTransaction()
-                // Update ticks
-                updateTicks()
-                // Return as complete
-                Completable.complete()
-            }
-        }
-    }
-
-    override fun updatePlace(place: PlaceItem): Completable {
-        return Completable.defer {
-            Realm.getDefaultInstance().use {
-                it.beginTransaction()
-                it.insertOrUpdate(place.toRealmPlace())
-                it.commitTransaction()
-                // Return as complete
-                Completable.complete()
-            }
-        }
-    }
-
-    override fun deletePlace(place: PlaceItem): Completable {
-        return Completable.defer {
-            Realm.getDefaultInstance().use {
-                it.beginTransaction()
-
-                // The field name IS NOT match to the name we defined in @RealmField
                 val items = it.where(RealmPlaceItem::class.java)
-                        .equalTo(RealmPlaceItemFields.ID, place.id)
                         .findAll()
-                if (items.isNotEmpty() && items.deleteAllFromRealm()) {
-                    it.commitTransaction()
-                    Completable.complete()
+
+                if (items != null) {
+                    Flowable.just(items.map { it.toPlaceItem() })
                 } else {
-                    it.cancelTransaction()
-                    Completable.error(Throwable("Cannot delete one or more places. No place(s) found."))
+                    Flowable.empty()
                 }
             }
         }
     }
 
-    override fun clearPlaces(): Completable {
-        return Completable.defer {
+    override fun getById(placeId: String): Flowable<PlaceItem> {
+        return Flowable.defer {
             Realm.getDefaultInstance().use {
-                val items = it.where(RealmPlaceItem::class.java).findAll()
-                if (items.isNotEmpty() && items.deleteAllFromRealm()) {
-                    Completable.complete()
+                val item = it.where(RealmPlaceItem::class.java)
+                        .equalTo(RealmPlaceItemFields.ID, placeId)
+                        .findFirst()
+
+                if (item != null) {
+                    Flowable.just(item.toPlaceItem())
                 } else {
-                    Completable.error(Throwable("Cannot delete one or more places. No place(s) found."))
+                    Flowable.empty()
+                }
+            }
+        }
+    }
+
+    override fun addPlace(place: PlaceItem) {
+        Realm.getDefaultInstance().use {
+            it.beginTransaction()
+            it.insertOrUpdate(place.toRealmPlace())
+            it.commitTransaction()
+        }
+    }
+
+    override fun addPlaces(places: List<PlaceItem>) {
+        Realm.getDefaultInstance().use {
+            it.beginTransaction()
+            it.insertOrUpdate(places.map { place: PlaceItem ->
+                place.toRealmPlace()
+            })
+            it.commitTransaction()
+            // Update ticks
+            updateTicks()
+        }
+    }
+
+    override fun updatePlace(place: PlaceItem) {
+        Realm.getDefaultInstance().use {
+            it.beginTransaction()
+            it.insertOrUpdate(place.toRealmPlace())
+            it.commitTransaction()
+        }
+    }
+
+    override fun deletePlace(place: PlaceItem) {
+        Realm.getDefaultInstance().use {
+            // The field name IS NOT match to the name we defined in @RealmField
+            val items = it.where(RealmPlaceItem::class.java)
+                    .equalTo(RealmPlaceItemFields.ID, place.id)
+                    .findAll()
+
+            if (items.isNotEmpty()) {
+                it.beginTransaction()
+                val canDelete = items.deleteAllFromRealm()
+
+                if (canDelete) {
+                    it.commitTransaction()
+                } else {
+                    it.cancelTransaction()
+                    throw Throwable("Cannot delete one or more place(s).")
+                }
+            } else {
+                throw Throwable("Cannot delete one or more place(s). Place(s) not found.")
+            }
+        }
+    }
+
+    override fun clearPlaces() {
+        Realm.getDefaultInstance().use {
+            val items = it.where(RealmPlaceItem::class.java).findAll()
+
+            if (items.isNotEmpty()) {
+                it.beginTransaction()
+                if (items.deleteAllFromRealm()) {
+                    it.commitTransaction()
+                } else {
+                    it.cancelTransaction()
+                    throw Throwable("Cannot delete one or more place(s).")
                 }
             }
         }

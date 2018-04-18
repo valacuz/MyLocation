@@ -24,7 +24,7 @@ class RemotePlaceDataSource private constructor(
                     .map { it.toPlaceItem() }
                     .toFlowable(BackpressureStrategy.LATEST)
 
-    override fun addPlace(place: PlaceItem): Completable {
+    override fun addPlace(place: PlaceItem) {
         val body = hashMapOf(
                 "place_id" to place.id,
                 "place_name" to place.name,
@@ -33,13 +33,14 @@ class RemotePlaceDataSource private constructor(
                 "longitude" to place.longitude,
                 "starred" to place.isStarred
         )
-        return samplePlaceService.addPlace(body)
+        samplePlaceService.addPlace(body)
     }
 
-    // Operation not support on remote, so we always return complete.
-    override fun addPlaces(places: List<PlaceItem>): Completable = Completable.complete()
+    override fun addPlaces(places: List<PlaceItem>) {
+        // Operation not support on remote, so we always return complete.
+    }
 
-    override fun updatePlace(place: PlaceItem): Completable {
+    override fun updatePlace(place: PlaceItem) {
         // Operation not support on remote.
         val body = hashMapOf(
                 "place_id" to place.id,
@@ -49,12 +50,16 @@ class RemotePlaceDataSource private constructor(
                 "longitude" to place.longitude,
                 "starred" to place.isStarred
         )
-        return samplePlaceService.updatePlace(place.id, body)
+        samplePlaceService.updatePlace(place.id, body)
     }
 
-    override fun deletePlace(place: PlaceItem): Completable = samplePlaceService.deletePlace(place.id)
+    override fun deletePlace(place: PlaceItem) {
+        samplePlaceService.deletePlace(place.id)
+    }
 
-    override fun clearPlaces(): Completable = samplePlaceService.clearPlaces()
+    override fun clearPlaces() {
+        samplePlaceService.clearPlaces()
+    }
 
     override fun isDirty(): Boolean = false // Never!
 

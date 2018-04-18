@@ -7,7 +7,6 @@ import com.example.valacuz.mylocations.data.PlaceType
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
 import com.example.valacuz.mylocations.extension.toPlaceType
 import com.example.valacuz.mylocations.extension.toRealmPlaceType
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.realm.Realm
 
@@ -16,8 +15,8 @@ class RealmPlaceTypeDataSource private constructor(
 
     override fun getAllTypes(): Flowable<List<PlaceType>> {
         return Flowable.just(
-                Realm.getDefaultInstance().use {
-                    it.where(RealmPlaceType::class.java)
+                Realm.getDefaultInstance().use { realm ->
+                    realm.where(RealmPlaceType::class.java)
                             .findAll()
                             .map { items ->
                                 items.toPlaceType()
@@ -25,30 +24,27 @@ class RealmPlaceTypeDataSource private constructor(
                 })
     }
 
-    override fun addTypes(types: List<PlaceType>): Completable {
-        return Completable.defer {
-            Realm.getDefaultInstance().use {
-                it.beginTransaction()
-                it.insertOrUpdate(types.map { type: PlaceType ->
-                    type.toRealmPlaceType()
-                })
-                it.commitTransaction()
-                // Update ticks
-                updateTicks()
-                // Return as complete
-                Completable.complete()
-            }
+    override fun addTypes(types: List<PlaceType>) {
+        Realm.getDefaultInstance().use { realm ->
+            realm.beginTransaction()
+            realm.insertOrUpdate(types.map { type: PlaceType -> type.toRealmPlaceType() })
+            realm.commitTransaction()
+            // Update ticks
+            updateTicks()
         }
     }
 
-    override fun clearTypes(): Completable {
-        return Completable.defer {
-            Realm.getDefaultInstance().use {
-                val items = it.where(RealmPlaceType::class.java).findAll()
-                if (items.isNotEmpty() && items.deleteAllFromRealm()) {
-                    Completable.complete()
+    override fun clearTypes() {
+        Realm.getDefaultInstance().use { realm ->
+            val items = realm.where(RealmPlaceType::class.java).findAll()
+            if (items.isNotEmpty()) {
+                realm.beginTransaction()
+                val isDeleted = items.deleteAllFromRealm()
+                if (isDeleted) {
+                    realm.commitTransaction()
                 } else {
-                    Completable.error(Throwable("Cannot delete one or more place types. No place type(s) found."))
+                    realm.cancelTransaction()
+                    throw Throwable("Cannot delete one or more place types. No place type(s) found.")
                 }
             }
         }

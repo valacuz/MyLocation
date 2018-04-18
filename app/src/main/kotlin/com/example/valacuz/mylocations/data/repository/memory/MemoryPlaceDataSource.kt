@@ -2,7 +2,6 @@ package com.example.valacuz.mylocations.data.repository.memory
 
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
-import io.reactivex.Completable
 import io.reactivex.Flowable
 
 open class MemoryPlaceDataSource internal constructor() : PlaceDataSource {
@@ -28,62 +27,57 @@ open class MemoryPlaceDataSource internal constructor() : PlaceDataSource {
         }
     }
 
-    override fun addPlace(place: PlaceItem): Completable {
-        return Completable.defer {
-            if (!items.contains(place)) {
-                val currentSize = items.size
-                items.add(place)
-                // If place add successfully, new size must be higher than previous size.
-                if (items.size > currentSize) {
-                    Completable.complete()
-                } else {
-                    Completable.error(Throwable("Cannot add new place."))
-                }
+    override fun addPlace(place: PlaceItem) {
+        if (!items.contains(place)) {
+            val currentSize = items.size
+            items.add(place)
+
+            // If place add successfully, new size must be higher than previous size.
+            if (items.size > currentSize) {
+                ticks = System.currentTimeMillis()
             } else {
-                updatePlace(place)
+                throw Throwable("Cannot add new place.")
             }
+        } else {
+            updatePlace(place)
         }
     }
 
-    override fun addPlaces(places: List<PlaceItem>): Completable {
-        return Completable.defer {
-            items.clear()
-            items.addAll(places)
+    override fun addPlaces(places: List<PlaceItem>) {
+        val currentSize = items.size
+        items.addAll(places)
+
+        // If place add successfully, new size must be higher than previous size.
+        if (items.size > currentSize) {
             ticks = System.currentTimeMillis()
-            Completable.complete()
+        } else {
+            throw Throwable("Cannot add new place.")
         }
     }
 
-    override fun updatePlace(place: PlaceItem): Completable {
-        return Completable.defer {
-            val index = items.indexOfFirst { it.id == place.id }
-            if (index >= 0) {
-                items[index] = place
-                Completable.complete()
-            } else {
-                Completable.error(Throwable("Cannot update place."))
-            }
+    override fun updatePlace(place: PlaceItem) {
+        val index = items.indexOfFirst { it.id == place.id }
+        if (index >= 0) {
+            items[index] = place
+        } else {
+            throw Throwable("Cannot update place. place not found.")
         }
     }
 
-    override fun deletePlace(place: PlaceItem): Completable {
-        return Completable.defer {
-            if (items.removeAll { it.id == place.id }) {
-                Completable.complete()
-            } else {
-                Completable.error(Throwable("Place not found."))
-            }
+    override fun deletePlace(place: PlaceItem) {
+        if (items.removeAll { it.id == place.id }) {
+            ticks = System.currentTimeMillis()
+        } else {
+            throw Throwable("Cannot delete one or more place(s). Place not found.")
         }
     }
 
-    override fun clearPlaces(): Completable {
-        return Completable.defer {
-            items.clear()
-            if (items.isEmpty()) {
-                Completable.complete()
-            } else {
-                Completable.error(Throwable("Cannot delete one or more places."))
-            }
+    override fun clearPlaces() {
+        items.clear()
+        if (items.isEmpty()) {
+            ticks = System.currentTimeMillis()
+        } else {
+            throw Throwable("Cannot delete one or more place(s).")
         }
     }
 

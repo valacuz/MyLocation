@@ -6,7 +6,7 @@ import io.realm.annotations.RealmClass
 import io.realm.annotations.RealmField
 
 @RealmClass(name = "tbl_place_type")
-class RealmPlaceType(
+open class RealmPlaceType(
         @RealmField(name = "type_id") @PrimaryKey var id: Int,
         @RealmField(name = "type_name") var name: String)
     : RealmObject() {

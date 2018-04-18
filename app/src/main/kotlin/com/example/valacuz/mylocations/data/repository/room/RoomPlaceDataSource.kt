@@ -26,60 +26,37 @@ class RoomPlaceDataSource private constructor(
                 .map { it.toPlaceItem() }
     }
 
-    override fun addPlace(place: PlaceItem): Completable {
-        return Completable.defer {
-            if (placeDao.addPlace(place.toRoomPlace()) > 0) {
-                Completable.complete()
-            } else {
-                Completable.error(Throwable("Cannot add new place."))
-            }
+    override fun addPlace(place: PlaceItem) {
+        if (placeDao.addPlace(place.toRoomPlace()) <= 0) {
+            throw Throwable("Cannot add new place.")
         }
     }
 
-    override fun addPlaces(places: List<PlaceItem>): Completable {
-        // Clear old one
-        return clearPlaces()
-                .andThen(Completable.defer {
-                    // Add places
-                    val roomPlaces = places.map { it.toRoomPlace() }
-                    placeDao.addPlaces(roomPlaces)
-                    // Update ticks
-                    updateTicks()
-                    // Return as complete
-                    Completable.complete()
-                })
+    override fun addPlaces(places: List<PlaceItem>) {
+        // Add places
+        val roomPlaces = places.map { it.toRoomPlace() }
+        placeDao.addPlaces(roomPlaces)
+        // Update ticks
+        updateTicks()
+        // Return as complete
+        Completable.complete()
     }
 
-    override fun updatePlace(place: PlaceItem): Completable {
-        return Completable.defer {
-            if (placeDao.updatePlace(place.toRoomPlace()) > 0) {
-                Completable.complete()
-            } else {
-                Completable.error(Throwable("Cannot update place."))
-            }
+    override fun updatePlace(place: PlaceItem) {
+        if (placeDao.updatePlace(place.toRoomPlace()) <= 0) {
+            throw Throwable("Cannot update place.")
         }
     }
 
-    override fun deletePlace(place: PlaceItem): Completable {
-        // Here is observe thread
-        // (exception will be thrown because room database doesn't allow to working on UI thread)
-        return Completable.defer {
-            // Here is subscribe thread
-            if (placeDao.deletePlace(place.toRoomPlace()) > 0) {
-                Completable.complete()
-            } else {
-                Completable.error(Throwable("Place not found."))
-            }
+    override fun deletePlace(place: PlaceItem) {
+        if (placeDao.deletePlace(place.toRoomPlace()) <= 0) {
+            throw Throwable("Cannot delete one or more place(s). Place not found.")
         }
     }
 
-    override fun clearPlaces(): Completable {
-        return Completable.defer {
-            if (placeDao.clearPlaces() > 0) {
-                Completable.complete()
-            } else {
-                Completable.error(Throwable("Cannot delete one or more places."))
-            }
+    override fun clearPlaces() {
+        if (placeDao.clearPlaces() < 0) {
+            throw Throwable("Cannot delete one or more place(s).")
         }
     }
 

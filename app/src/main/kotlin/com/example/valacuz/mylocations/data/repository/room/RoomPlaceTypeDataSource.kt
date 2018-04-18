@@ -7,7 +7,6 @@ import com.example.valacuz.mylocations.data.PlaceType
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
 import com.example.valacuz.mylocations.extension.toPlaceType
 import com.example.valacuz.mylocations.extension.toRoomPlaceType
-import io.reactivex.Completable
 import io.reactivex.Flowable
 
 class RoomPlaceTypeDataSource private constructor(
@@ -21,26 +20,16 @@ class RoomPlaceTypeDataSource private constructor(
                 }
     }
 
-    override fun addTypes(types: List<PlaceType>): Completable {
-        // Clear old one
-        return clearTypes()
-                .andThen(Completable.defer {
-                    // Add new place types
-                    val roomTypes = types.map { it.toRoomPlaceType() }
-                    placeTypeDao.addPlaceTypes(roomTypes)
-                    // Update ticks
-                    updateTicks()
-                    // Return as complete
-                    Completable.complete()
-                })
+    override fun addTypes(types: List<PlaceType>) {
+        // Add new place types
+        placeTypeDao.addPlaceTypes(types.map { it.toRoomPlaceType() })
+        // Update ticks
+        updateTicks()
     }
 
-    override fun clearTypes(): Completable {
-        return Completable.defer {
-            if (placeTypeDao.clearPlaceTypes() > 0)
-                Completable.complete()
-            else
-                Completable.error(Throwable("Cannot delete one or more place types"))
+    override fun clearTypes() {
+        if (placeTypeDao.clearPlaceTypes() < 0) {
+            throw Throwable("Cannot delete one or more place types")
         }
     }
 

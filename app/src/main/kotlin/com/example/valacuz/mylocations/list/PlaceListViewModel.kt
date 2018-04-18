@@ -9,6 +9,7 @@ import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.util.EspressoIdlingResource
 import com.example.valacuz.mylocations.util.schedulers.SchedulerProvider
+import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 
 class PlaceListViewModel(private val itemDataSource: PlaceDataSource,
@@ -43,7 +44,7 @@ class PlaceListViewModel(private val itemDataSource: PlaceDataSource,
     }
 
     fun onDeletePlaceClick(place: PlaceItem) {
-        val disposable = itemDataSource.deletePlace(place)
+        val disposable = Completable.fromAction { itemDataSource.deletePlace(place) }
                 .observeOn(schedulerProvider.ui())
                 .subscribeOn(schedulerProvider.io())
                 .subscribe({
