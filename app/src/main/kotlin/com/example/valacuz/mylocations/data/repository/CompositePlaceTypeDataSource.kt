@@ -36,7 +36,11 @@ class CompositePlaceTypeDataSource private constructor(
 
     override fun addTypes(types: List<PlaceType>) {
         remoteSource.addTypes(types)
+        // Clear old types from database before add new ones.
+        localSource.clearTypes()
         localSource.addTypes(types)
+        // Clear old types from memory before add new ones.
+        memorySource.clearTypes()
         memorySource.addTypes(types)
     }
 

@@ -25,15 +25,21 @@ class CompositePlaceDataSource private constructor(
     private fun getAllPlacesFromMemory() = memorySource.getAllPlaces()
 
     private fun getAllPlacesFromLocal() = localSource.getAllPlaces()
-            .doOnNext({
+            .doOnNext {
+                // Clear old places from memory and add new ones.
+                memorySource.clearPlaces()
                 memorySource.addPlaces(it)
-            })
+            }
 
     private fun getAllPlacesFromRemote() = remoteSource.getAllPlaces()
-            .doOnNext({
+            .doOnNext {
+                // Clear old places from database and add new ones.
+                localSource.clearPlaces()
                 localSource.addPlaces(it)
+                // Clear old places from memory and add new ones.
+                memorySource.clearPlaces()
                 memorySource.addPlaces(it)
-            })
+            }
 
     override fun getById(placeId: String): Flowable<PlaceItem> {
         val index = arrayOf(memorySource, localSource, remoteSource).indexOfFirst { !it.isDirty() }
@@ -47,15 +53,15 @@ class CompositePlaceDataSource private constructor(
     private fun getByIdFromMemory(placeId: String) = memorySource.getById(placeId)
 
     private fun getByIdFromLocal(placeId: String) = localSource.getById(placeId)
-            .doOnNext({
+            .doOnNext {
                 memorySource.addPlace(it)
-            })
+            }
 
     private fun getByIdFromRemote(placeId: String) = remoteSource.getById(placeId)
-            .doOnNext({
+            .doOnNext {
                 localSource.addPlace(it)
                 memorySource.addPlace(it)
-            })
+            }
 
     override fun addPlace(place: PlaceItem) {
         remoteSource.addPlace(place)
@@ -65,7 +71,11 @@ class CompositePlaceDataSource private constructor(
 
     override fun addPlaces(places: List<PlaceItem>) {
         remoteSource.addPlaces(places)
+        // Clear old places from database and add new ones.
+        localSource.clearPlaces()
         localSource.addPlaces(places)
+        // Clear old places from memory and add new ones.
+        memorySource.clearPlaces()
         memorySource.addPlaces(places)
     }
 
