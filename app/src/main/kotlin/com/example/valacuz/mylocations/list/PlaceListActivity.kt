@@ -12,7 +12,7 @@ import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.ViewModelHolder
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
-import com.example.valacuz.mylocations.di.MainApplication
+import com.example.valacuz.mylocations.MainApplication
 import com.example.valacuz.mylocations.domain.display.MapDisplaySource
 import com.example.valacuz.mylocations.domain.share.ShareContentSource
 import com.example.valacuz.mylocations.form.PlaceFormActivity

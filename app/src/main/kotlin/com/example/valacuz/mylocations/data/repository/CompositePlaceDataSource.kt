@@ -1,7 +1,6 @@
 package com.example.valacuz.mylocations.data.repository
 
 import com.example.valacuz.mylocations.data.PlaceItem
-import io.reactivex.Completable
 import io.reactivex.Flowable
 
 /**
@@ -26,15 +25,21 @@ class CompositePlaceDataSource private constructor(
     private fun getAllPlacesFromMemory() = memorySource.getAllPlaces()
 
     private fun getAllPlacesFromLocal() = localSource.getAllPlaces()
-            .doOnNext({
+            .doOnNext {
+                // Clear old places from memory and add new ones.
+                memorySource.clearPlaces()
                 memorySource.addPlaces(it)
-            })
+            }
 
     private fun getAllPlacesFromRemote() = remoteSource.getAllPlaces()
-            .doOnNext({
+            .doOnNext {
+                // Clear old places from database and add new ones.
+                localSource.clearPlaces()
                 localSource.addPlaces(it)
+                // Clear old places from memory and add new ones.
+                memorySource.clearPlaces()
                 memorySource.addPlaces(it)
-            })
+            }
 
     override fun getById(placeId: String): Flowable<PlaceItem> {
         val index = arrayOf(memorySource, localSource, remoteSource).indexOfFirst { !it.isDirty() }
@@ -48,44 +53,48 @@ class CompositePlaceDataSource private constructor(
     private fun getByIdFromMemory(placeId: String) = memorySource.getById(placeId)
 
     private fun getByIdFromLocal(placeId: String) = localSource.getById(placeId)
-            .doOnNext({
+            .doOnNext {
                 memorySource.addPlace(it)
-            })
+            }
 
     private fun getByIdFromRemote(placeId: String) = remoteSource.getById(placeId)
-            .doOnNext({
+            .doOnNext {
                 localSource.addPlace(it)
                 memorySource.addPlace(it)
-            })
+            }
 
-    override fun addPlace(place: PlaceItem): Completable {
-        return remoteSource.addPlace(place)
-                .andThen(localSource.addPlace(place))
-                .andThen(memorySource.addPlace(place))
+    override fun addPlace(place: PlaceItem) {
+        remoteSource.addPlace(place)
+        localSource.addPlace(place)
+        memorySource.addPlace(place)
     }
 
-    override fun addPlaces(places: List<PlaceItem>): Completable {
-        return remoteSource.addPlaces(places)
-                .andThen(localSource.addPlaces(places))
-                .andThen(memorySource.addPlaces(places))
+    override fun addPlaces(places: List<PlaceItem>) {
+        remoteSource.addPlaces(places)
+        // Clear old places from database and add new ones.
+        localSource.clearPlaces()
+        localSource.addPlaces(places)
+        // Clear old places from memory and add new ones.
+        memorySource.clearPlaces()
+        memorySource.addPlaces(places)
     }
 
-    override fun updatePlace(place: PlaceItem): Completable {
-        return remoteSource.updatePlace(place)
-                .andThen(localSource.updatePlace(place))
-                .andThen(memorySource.updatePlace(place))
+    override fun updatePlace(place: PlaceItem) {
+        remoteSource.updatePlace(place)
+        localSource.updatePlace(place)
+        memorySource.updatePlace(place)
     }
 
-    override fun deletePlace(place: PlaceItem): Completable {
-        return remoteSource.deletePlace(place)
-                .andThen(localSource.deletePlace(place))
-                .andThen(memorySource.deletePlace(place))
+    override fun deletePlace(place: PlaceItem) {
+        remoteSource.deletePlace(place)
+        localSource.deletePlace(place)
+        memorySource.deletePlace(place)
     }
 
-    override fun clearPlaces(): Completable {
-        return remoteSource.clearPlaces()
-                .andThen(localSource.clearPlaces())
-                .andThen(memorySource.clearPlaces())
+    override fun clearPlaces() {
+        remoteSource.clearPlaces()
+        localSource.clearPlaces()
+        memorySource.clearPlaces()
     }
 
     override fun isDirty(): Boolean = false // Never!

@@ -6,7 +6,7 @@ import com.example.valacuz.mylocations.R
 
 object PlaceListItemBindings {
 
-    @BindingAdapter("bind:location_type")
+    @BindingAdapter(value = ["location_type"])
     @JvmStatic
     fun setIconType(imageView: ImageView, id: Int) {
         val resId = when (id) {

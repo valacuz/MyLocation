@@ -1,16 +1,11 @@
 package com.example.valacuz.mylocations.data.repository.room
 
-import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
 import android.content.Context
-import com.example.valacuz.mylocations.data.PlaceItem
-import com.example.valacuz.mylocations.data.PlaceType
-import java.util.concurrent.Executors
 
-
-@Database(entities = [PlaceItem::class, PlaceType::class], version = 1)
+@Database(entities = [RoomPlaceItem::class, RoomPlaceType::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun placeItemDao(): PlaceDao

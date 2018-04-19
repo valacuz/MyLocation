@@ -9,7 +9,7 @@ import com.google.android.gms.maps.model.LatLng
 
 object PlacePickerBindings {
 
-    @BindingAdapter("bind:center_location", "bind:zoom_level")
+    @BindingAdapter(value = ["center_location", "zoom_level"])
     @JvmStatic
     fun centerAt(mapView: MapView, latLng: LatLng?, zoomLevel: Float) {
         if (latLng != null) {

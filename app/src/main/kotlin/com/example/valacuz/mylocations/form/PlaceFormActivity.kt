@@ -14,7 +14,7 @@ import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.ViewModelHolder
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
-import com.example.valacuz.mylocations.di.MainApplication
+import com.example.valacuz.mylocations.MainApplication
 import com.example.valacuz.mylocations.picker.PlacePickerActivity
 import com.example.valacuz.mylocations.util.schedulers.SchedulerProvider
 import javax.inject.Inject

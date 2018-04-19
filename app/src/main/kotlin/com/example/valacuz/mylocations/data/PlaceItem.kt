@@ -1,18 +1,21 @@
 package com.example.valacuz.mylocations.data
 
-import android.arch.persistence.room.ColumnInfo
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
-import java.util.UUID
+import java.util.*
 
-@Entity(tableName = "tbl_place")
-data class PlaceItem constructor(@ColumnInfo(name = "place_name") var name: String?,
-                                 @ColumnInfo(name = "latitude") var latitude: Double,
-                                 @ColumnInfo(name = "longitude") var longitude: Double,
-                                 @ColumnInfo(name = "place_type") var type: Int,
-                                 @ColumnInfo(name = "starred") var isStarred: Boolean = false,
-                                 @ColumnInfo(name = "place_id") @PrimaryKey(autoGenerate = false)
-                                 var id: String = UUID.randomUUID().toString()) {
+/**
+ * I need to make this class plain, independent from any libraries (like annotations).
+ * Because it's clean and easier to manage compared to one class with many annotations (from GSON, Room, etc.).
+ * And when I have to use another library (like realm) this class will not need to change.
+ *
+ * But a trade-off is I have to create a lot of entity classes to handle each library.
+ */
+data class PlaceItem(
+        val name: String?,
+        val latitude: Double,
+        val longitude: Double,
+        val type: Int,
+        val isStarred: Boolean = false,
+        val id: String = UUID.randomUUID().toString()) {
 
     fun isEmpty(): Boolean = name.isNullOrEmpty()
 }
