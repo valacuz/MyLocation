@@ -12,7 +12,7 @@ import com.example.valacuz.mylocations.data.PlaceType
 
 object PlaceFormBindings {
 
-    @BindingAdapter(value = ["bind:typePickAttrChanged", "bind:type_pick", "bind:type_items"], requireAll = false)
+    @BindingAdapter(value = ["typePickAttrChanged", "type_pick", "type_items"], requireAll = false)
     @JvmStatic
     fun setSelectedPlaceType(spinner: AppCompatSpinner,
                              bindingListener: InverseBindingListener,
@@ -46,7 +46,7 @@ object PlaceFormBindings {
         }
     }
 
-    @InverseBindingAdapter(attribute = "bind:type_pick", event = "bind:typePickAttrChanged")
+    @InverseBindingAdapter(attribute = "type_pick", event = "typePickAttrChanged")
     @JvmStatic
     fun getSelectedPlaceType(spinner: AppCompatSpinner): PlaceType {
         return spinner.selectedItem as PlaceType

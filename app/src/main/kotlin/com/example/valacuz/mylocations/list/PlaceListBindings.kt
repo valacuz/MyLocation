@@ -6,7 +6,7 @@ import com.example.valacuz.mylocations.data.PlaceItem
 
 object PlaceListBindings {
 
-    @BindingAdapter("bind:place_items")
+    @BindingAdapter(value = ["place_items"])
     @JvmStatic
     fun setItems(recyclerView: RecyclerView, items: List<PlaceItem>) {
         val adapter = recyclerView.adapter

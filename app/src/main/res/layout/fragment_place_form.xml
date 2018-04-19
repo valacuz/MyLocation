@@ -1,6 +1,5 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:bind="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -48,13 +47,13 @@
         <android.support.v7.widget.AppCompatSpinner
             android:id="@+id/spinner_type"
             style="@style/place_form_spinner"
+            type_items="@{viewModel.placeTypes}"
+            type_pick="@={viewModel.selectedType}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/place_type"
             android:minHeight="@dimen/form_widget_min_height"
-            android:spinnerMode="dialog"
-            bind:type_items="@{viewModel.placeTypes}"
-            bind:type_pick="@={viewModel.selectedType}" />
+            android:spinnerMode="dialog" />
 
         <View
             android:layout_width="match_parent"
