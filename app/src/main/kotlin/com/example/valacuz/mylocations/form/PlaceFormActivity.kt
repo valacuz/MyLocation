@@ -10,11 +10,11 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import com.example.valacuz.mylocations.MainApplication
 import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.ViewModelHolder
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
-import com.example.valacuz.mylocations.MainApplication
 import com.example.valacuz.mylocations.picker.PlacePickerActivity
 import com.example.valacuz.mylocations.util.schedulers.SchedulerProvider
 import javax.inject.Inject
@@ -118,7 +118,8 @@ class PlaceFormActivity : AppCompatActivity(), PlaceFormNavigator {
             holder.getViewModel()!!
         } else {
             val schedulerProvider = SchedulerProvider()
-            val viewModel = PlaceFormViewModel(this, placeDataSource, placeTypeDataSource,
+            val messageProvider = ResourcePlaceFormMessageProvider(this)
+            val viewModel = PlaceFormViewModel(messageProvider, placeDataSource, placeTypeDataSource,
                     schedulerProvider, mPlaceId)
             supportFragmentManager
                     .beginTransaction()
