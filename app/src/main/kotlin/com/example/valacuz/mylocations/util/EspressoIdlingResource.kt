@@ -1,7 +1,5 @@
 package com.example.valacuz.mylocations.util
 
-import android.support.test.espresso.idling.CountingIdlingResource
-
 class EspressoIdlingResource {
 
     companion object {
