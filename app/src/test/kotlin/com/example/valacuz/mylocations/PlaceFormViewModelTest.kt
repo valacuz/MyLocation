@@ -165,6 +165,6 @@ class PlaceFormViewModelTest {
         updateViewModel.saveButtonClick()
 
         // Then error message should be set (and display on view)
-        assert(viewModel.errorMessage.get() == emptyNameMessage)
+        assert(updateViewModel.errorMessage.get() == emptyNameMessage)
     }
 }
