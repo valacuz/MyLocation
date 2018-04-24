@@ -5,17 +5,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.VisibleForTesting
 import android.support.test.espresso.IdlingResource
-import android.support.test.espresso.idling.CountingIdlingResource
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import com.example.valacuz.mylocations.MainApplication
 import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.ViewModelHolder
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
-import com.example.valacuz.mylocations.MainApplication
 import com.example.valacuz.mylocations.domain.display.MapDisplaySource
 import com.example.valacuz.mylocations.domain.share.ShareContentSource
 import com.example.valacuz.mylocations.form.PlaceFormActivity
+import com.example.valacuz.mylocations.util.CountingIdlingResource
 import com.example.valacuz.mylocations.util.schedulers.SchedulerProvider
 import javax.inject.Inject
 
