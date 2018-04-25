@@ -1,21 +1,19 @@
 package com.example.valacuz.mylocations.form
 
-import android.content.Context
 import android.databinding.*
-import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.PlaceType
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
 import com.example.valacuz.mylocations.util.EspressoIdlingResource
-import com.example.valacuz.mylocations.util.schedulers.SchedulerProvider
+import com.example.valacuz.mylocations.util.schedulers.BaseSchedulerProviders
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 
-class PlaceFormViewModel(context: Context,
+class PlaceFormViewModel(private val messageProvider: PlaceFormMessageProvider,
                          private val itemDataSource: PlaceDataSource,
                          private val typeDataSource: PlaceTypeDataSource,
-                         private val schedulerProvider: SchedulerProvider,
+                         private val schedulerProvider: BaseSchedulerProviders,
                          id: String? = null)
     : BaseObservable() {
 
@@ -31,16 +29,13 @@ class PlaceFormViewModel(context: Context,
     val starred: ObservableBoolean = ObservableBoolean(false)
 
     // Used to display error messages
-    val errorMessage: ObservableField<String> = ObservableField()
+    val errorMessage: ObservableField<String?> = ObservableField()
 
     // Used to display coordinate in format {lat}, {lon}
     val coordinateString: ObservableField<String> = ObservableField()
 
     // Used to binding with spinner for types of place
     val placeTypes: ObservableList<PlaceType> = ObservableArrayList()
-
-    //
-    private val context: Context = context.applicationContext  // Force application context to avoid leaks
 
     private var navigator: PlaceFormNavigator? = null
 
@@ -131,7 +126,7 @@ class PlaceFormViewModel(context: Context,
                             isStarred: Boolean) {
         val place = PlaceItem(name, latitude, longitude, type, isStarred)
         if (place.isEmpty()) {
-            errorMessage.set(context.getString(R.string.msg_empty_name))
+            errorMessage.set(messageProvider.getErrorEmptyName())
         } else {
             // Mark as busy
             EspressoIdlingResource.increment()
@@ -157,7 +152,7 @@ class PlaceFormViewModel(context: Context,
                                id: String) {
         val place = PlaceItem(name, latitude, longitude, type, isStarred, id)
         if (place.isEmpty()) {
-            errorMessage.set(context.getString(R.string.msg_empty_name))
+            errorMessage.set(messageProvider.getErrorEmptyName())
         } else {
             // Mark as busy
             EspressoIdlingResource.increment()

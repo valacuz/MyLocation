@@ -3,7 +3,7 @@ package com.example.valacuz.mylocations.di.module
 import android.content.Context
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.data.repository.PlaceTypeDataSource
-import com.example.valacuz.mylocations.data.repository.mock.MockPlaceDataSource
+import com.example.valacuz.mylocations.data.repository.memory.MemoryPlaceDataSource
 import com.example.valacuz.mylocations.data.repository.mock.MockPlaceTypeDataSource
 import dagger.Module
 import dagger.Provides
@@ -12,7 +12,7 @@ import dagger.Provides
 class DataSourceModule(private val context: Context) {
 
     @Provides
-    fun providePlaceDataSource(): PlaceDataSource = MockPlaceDataSource.getInstance()
+    fun providePlaceDataSource(): PlaceDataSource = MemoryPlaceDataSource.getInstance()
 
     @Provides
     fun providePlaceTypeSource(): PlaceTypeDataSource = MockPlaceTypeDataSource.getInstance()

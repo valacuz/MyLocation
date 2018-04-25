@@ -8,12 +8,12 @@ import com.example.valacuz.mylocations.BR
 import com.example.valacuz.mylocations.data.PlaceItem
 import com.example.valacuz.mylocations.data.repository.PlaceDataSource
 import com.example.valacuz.mylocations.util.EspressoIdlingResource
-import com.example.valacuz.mylocations.util.schedulers.SchedulerProvider
+import com.example.valacuz.mylocations.util.schedulers.BaseSchedulerProviders
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 
 class PlaceListViewModel(private val itemDataSource: PlaceDataSource,
-                         private val schedulerProvider: SchedulerProvider) : BaseObservable() {
+                         private val schedulerProvider: BaseSchedulerProviders) : BaseObservable() {
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -27,7 +27,9 @@ class PlaceListViewModel(private val itemDataSource: PlaceDataSource,
     }
 
     // Called by the data binding library and button click listener.
-    fun addNewTask() = navigator?.addLocation()
+    fun addNewTask() {
+        navigator?.addLocation()
+    }
 
     @Bindable
     fun isEmpty(): Boolean = items.isEmpty()
