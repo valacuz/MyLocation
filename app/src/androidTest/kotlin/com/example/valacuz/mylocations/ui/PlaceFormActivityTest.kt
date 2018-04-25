@@ -6,7 +6,6 @@ import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.intent.Intents.intended
 import android.support.test.espresso.intent.Intents.intending
 import android.support.test.espresso.intent.matcher.IntentMatchers.hasAction
 import android.support.test.espresso.intent.matcher.IntentMatchers.toPackage
@@ -19,7 +18,6 @@ import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.list.PlaceListActivity
 import com.example.valacuz.mylocations.ui.actions.ViewActionUtils.Companion.waitFor
 import com.example.valacuz.mylocations.ui.matchers.MatcherUtils.Companion.withRecyclerItemText
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -108,7 +106,6 @@ class PlaceFormActivityTest {
 
     // Due to this case must be tested on emulator which support google play service.
     // I have to temporary ignore this case until I can setup travis ci for testing it.
-    @Ignore
     @Test
     fun showMap_displayDialog() {
         val placeName = "SHOW_PLACE"
@@ -126,12 +123,11 @@ class PlaceFormActivityTest {
         onView(withText(menuText[0])).inRoot(isDialog()).perform(click())
 
         // Then an intent resolving to the "google map" activity has been sent.
-        intended(toPackage("com.google.android.apps.maps"))
+        intending(toPackage("com.google.android.apps.maps"))
     }
 
     // Due to this case must be tested on emulator which support google play service.
     // I have to temporary ignore this case until I can setup travis ci for testing it.
-    @Ignore
     @Test
     fun sharePlace_displayDialog() {
         val placeName = "SHARE_PLACE"
@@ -173,7 +169,7 @@ class PlaceFormActivityTest {
     }
 
     // Helper method that add place by specific name.
-    private fun addSuccessPlace(placeName: String, needLocation: Boolean = true) {
+    private fun addSuccessPlace(placeName: String, needLocation: Boolean = false) {
         // Precondition: Click on add button
         onView(withId(R.id.add_button)).perform(click())
 
@@ -196,7 +192,7 @@ class PlaceFormActivityTest {
 
         // Start with current location
         onView(withId(R.id.current_button)).perform(click())
-        onView(isRoot()).perform(waitFor(3000L))    // Delay for zoom & pan animation.
+        onView(isRoot()).perform(waitFor(2000L))    // Delay for zoom & pan animation.
 
         val random = Random()
         val numberOfSwipe = random.nextInt(4)
