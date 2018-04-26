@@ -1,28 +1,73 @@
 language: android
 jdk: oraclejdk8
 
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle
+    - $HOME/.gradle/caches
+    - $HOME/.gradle/wrapper
+
+env:
+  global:
+    - BUILD_TOOL_VERSION=27.0.3
+    - EMULATOR_API_LEVEL=22
+    - ANDROID_API_LEVEL=27
+    - ANDROID_ABI=armeabi-v7a
+    - ANDROID_TAG=google_apis
+    - ADB_INSTALL_TIMEOUT=5 # 2 Minutes by default
+
 android:
   components:
-    - tools
-    - platform-tools
+    - tools # to install Android SDK tools 25+, latest, cannot get more granular control than this
+    # See https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943 for more details.
+    - platform-tools #latest
+
+    # build tools version
+    - build-tools-$BUILD_TOOL_VERSION
+
+    # Android SDK version
+    - android-$ANDROID_API_LEVEL
+    - android-$EMULATOR_API_LEVEL
+
+    # Addition components
+    - extra-google-m2repository
+    - extra-google-google_play_service  # play service
+    - extra-android-support # support library
+    - extra-android-m2repository  # design library
+
+    # Specify system image
+    # - sys-img-armeabi-v7a-android-22
+    - sys-img-armeabi-v7a-google_apis-$ANDROID_API_LEVEL
+    - sys-img-armeabi-v7a-google_apis-$EMULATOR_API_LEVEL
+
+  # Accept licenses
+  licenses: 
+    - 'android-sdk-preview-license-.+'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
 
 before_install:
   # Install SDK license so Android Gradle plugin can install deps.
   - mkdir "$ANDROID_HOME/licenses" || true
   - echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
-  # Install the rest of tools (e.g., avdmanager)
-  - sdkmanager tools
-  # Install the system image
-  - sdkmanager "system-images;android-25;google_apis;armeabi-v7a"
-  # Create and start emulator for the script. Meant to race the install task.
-  - echo no | avdmanager create avd --force -n test -k "system-images;android-25;google_apis;armeabi-v7a"
-  - $ANDROID_HOME/emulator/emulator -avd test -no-audio -no-window &
+  # Create emulator
+  - echo no | android create avd --force -n test -t "android-"$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
+  # Start emulator
+  - emulator -avd test -no-audio -no-window &
 
 before_script:
   # Wait until emulator started
   - android-wait-for-emulator
+  # Disable animation
+  - adb shell settings put global window_animation_scale 0 &
+  - adb shell settings put global transition_animation_scale 0 &
+  - adb shell settings put global animator_duration_scale 0 &
   # Unlock emulator
-  - adb shell input keyevent 82
+  - adb shell input keyevent 82 &
   # Prevent emulator locking itself again
   - adb shell svc power stayon true
   # Make gradle output info-level logging, so the tests do not timeout
@@ -33,7 +78,3 @@ script:
   - ./gradlew test
   # Run Instrumented unit test (deploy application)
   - ./gradlew connectedAndroidTest
-
-cache:
-  directories:
-    - $HOME/.gradle/
