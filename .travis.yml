@@ -55,26 +55,26 @@ before_install:
   - mkdir "$ANDROID_HOME/licenses" || true
   - echo "d56f5187479451eabf01fb78af6dfcb131a6481e" > "$ANDROID_HOME/licenses/android-sdk-license"
   # Create emulator
-  - echo no | android create avd --force -n test -t "android-"$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
+  # - echo no | android create avd --force -n test -t "android-"$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
   # Start emulator
-  - emulator -avd test -no-window &
+  # - emulator -avd test -no-window &
 
 before_script:
   # Wait until emulator started
-  - android-wait-for-emulator
+  # - android-wait-for-emulator
   # Disable animation
-  - adb shell settings put global window_animation_scale 0 &
-  - adb shell settings put global transition_animation_scale 0 &
-  - adb shell settings put global animator_duration_scale 0 &
+  # - adb shell settings put global window_animation_scale 0 &
+  # - adb shell settings put global transition_animation_scale 0 &
+  # - adb shell settings put global animator_duration_scale 0 &
   # Unlock emulator
-  - adb shell input keyevent 82 &
+  # - adb shell input keyevent 82 &
   # Prevent emulator locking itself again
-  - adb shell svc power stayon true
+  # - adb shell svc power stayon true
   # Make gradle output info-level logging, so the tests do not timeout
-  - ./gradlew build connectCheck --info -PdisablePreDex;
+  # - ./gradlew build connectCheck --info -PdisablePreDex;
 
 script:
   # Run local unit test (don't deploy application)
   - ./gradlew test
   # Run Instrumented unit test (deploy application)
-  - ./gradlew connectedAndroidTest
+  # - ./gradlew connectedAndroidTest
