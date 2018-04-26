@@ -14,7 +14,7 @@ cache:
 env:
   global:
     - BUILD_TOOL_VERSION=27.0.3
-    - EMULATOR_API_LEVEL=22
+    - EMULATOR_API_LEVEL=23
     - ANDROID_API_LEVEL=27
     - ANDROID_ABI=armeabi-v7a
     - ANDROID_TAG=google_apis
@@ -57,7 +57,7 @@ before_install:
   # Create emulator
   - echo no | android create avd --force -n test -t "android-"$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
   # Start emulator
-  - emulator -avd test -no-audio -no-window &
+  - emulator -avd test -no-window &
 
 before_script:
   # Wait until emulator started
