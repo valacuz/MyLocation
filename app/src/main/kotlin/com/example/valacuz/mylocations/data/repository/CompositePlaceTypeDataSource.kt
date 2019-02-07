@@ -24,15 +24,15 @@ class CompositePlaceTypeDataSource private constructor(
     private fun getAllTypesFromMemory() = memorySource.getAllTypes()
 
     private fun getAllTypesFromLocal() = localSource.getAllTypes()
-            .doOnNext({
+            .doOnNext {
                 memorySource.addTypes(it)
-            })
+            }
 
     private fun getAllTypesFromRemote() = remoteSource.getAllTypes()
-            .doOnNext({
+            .doOnNext {
                 localSource.addTypes(it)
                 memorySource.addTypes(it)
-            })
+            }
 
     override fun addTypes(types: List<PlaceType>) {
         remoteSource.addTypes(types)

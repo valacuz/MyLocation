@@ -12,8 +12,6 @@ import com.example.valacuz.mylocations.data.repository.FusedLocationSource
 
 class PlacePickerActivity : AppCompatActivity(), PlacePickerNavigator {
 
-    private val VIEW_MODEL_TAG = "MAP_VM_TAG"
-
     private lateinit var viewModel: PlacePickerViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,5 +97,10 @@ class PlacePickerActivity : AppCompatActivity(), PlacePickerNavigator {
                     .commit()
         }
         return fragment
+    }
+
+    companion object {
+
+        private const val VIEW_MODEL_TAG = "MAP_VM_TAG"
     }
 }

@@ -12,7 +12,7 @@ interface PlaceDao {
      *
      * @return A list of [RoomPlaceItem].
      */
-    @Query("SELECT * FROM tbl_place")
+    @Query("SELECT * FROM ${RoomPlaceItem.TABLE_NAME}")
     fun getAllPlaces(): Flowable<List<RoomPlaceItem>>
 
     /**
@@ -21,7 +21,7 @@ interface PlaceDao {
      * @param placeId Place id to be retrieved.
      * @return A [RoomPlaceItem]
      */
-    @Query("SELECT * FROM tbl_place WHERE place_id = :placeId")
+    @Query("SELECT * FROM ${RoomPlaceItem.TABLE_NAME} WHERE ${RoomPlaceItem.COL_ID} = :placeId")
     fun getById(placeId: String): Flowable<RoomPlaceItem>
 
     /**
@@ -62,6 +62,6 @@ interface PlaceDao {
      *
      * @return A number of places deleted.
      */
-    @Query("DELETE FROM tbl_place")
+    @Query("DELETE FROM ${RoomPlaceItem.TABLE_NAME}")
     fun clearPlaces(): Int
 }

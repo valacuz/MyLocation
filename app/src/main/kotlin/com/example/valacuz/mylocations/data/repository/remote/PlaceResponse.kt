@@ -8,4 +8,5 @@ class PlaceResponse(
         @SerializedName("place_type") var type: Int,
         @SerializedName("latitude") var latitude: Double,
         @SerializedName("longitude") var longitude: Double,
-        @SerializedName("starred") var starred: Boolean)
+        @SerializedName("starred") var starred: Boolean,
+        @SerializedName("picture_url") var pictureUrl: String?)

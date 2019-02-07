@@ -12,23 +12,23 @@ import com.example.valacuz.mylocations.data.repository.room.RoomPlaceType
 // == Place Item extensions
 
 fun PlaceResponse.toPlaceItem(): PlaceItem {
-    return PlaceItem(name, latitude, longitude, type, starred, id)
+    return PlaceItem(name, latitude, longitude, type, starred, pictureUrl, id)
 }
 
 fun RoomPlaceItem.toPlaceItem(): PlaceItem {
-    return PlaceItem(name, latitude, longitude, type, isStarred, id)
+    return PlaceItem(name, latitude, longitude, type, isStarred, picturePath, id)
 }
 
 fun RealmPlaceItem.toPlaceItem(): PlaceItem {
-    return PlaceItem(name, latitude, longitude, type, isStarred, id)
+    return PlaceItem(name, latitude, longitude, type, isStarred, picturePath, id)
 }
 
 fun PlaceItem.toRoomPlace(): RoomPlaceItem {
-    return RoomPlaceItem(name, latitude, longitude, type, isStarred, id)
+    return RoomPlaceItem(name, latitude, longitude, type, isStarred, picturePath, id)
 }
 
 fun PlaceItem.toRealmPlace(): RealmPlaceItem {
-    return RealmPlaceItem(name, latitude, longitude, type, isStarred, id)
+    return RealmPlaceItem(name, latitude, longitude, type, isStarred, picturePath, id)
 }
 
 // == PlaceType extensions

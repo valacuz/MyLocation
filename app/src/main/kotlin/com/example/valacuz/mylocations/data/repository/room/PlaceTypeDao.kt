@@ -9,7 +9,7 @@ import io.reactivex.Flowable
 @Dao
 interface PlaceTypeDao {
 
-    @Query(value = "SELECT * FROM tbl_place_type")
+    @Query(value = "SELECT * FROM ${RoomPlaceType.TABLE_NAME}")
     fun getAllTypes(): Flowable<List<RoomPlaceType>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -20,6 +20,6 @@ interface PlaceTypeDao {
      *
      * @return A number of places deleted.
      */
-    @Query("DELETE FROM tbl_place_type")
+    @Query("DELETE FROM ${RoomPlaceType.TABLE_NAME}")
     fun clearPlaceTypes(): Int
 }

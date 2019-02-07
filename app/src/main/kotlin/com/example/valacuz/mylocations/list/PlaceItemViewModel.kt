@@ -22,6 +22,9 @@ class PlaceItemViewModel(placeItem: PlaceItem) : BaseObservable() {
     @Bindable
     fun getCoordinateString(): String = "%.6f, %.6f".format(place.latitude, place.longitude)
 
+    @Bindable
+    fun getPicturePath(): String? = place.picturePath
+
     fun placeClick() {
         placeItemNavigator?.get()?.displayDetail(place.id)
     }

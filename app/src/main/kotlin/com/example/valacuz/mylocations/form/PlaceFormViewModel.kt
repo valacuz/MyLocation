@@ -18,6 +18,8 @@ class PlaceFormViewModel(private val messageProvider: PlaceFormMessageProvider,
     : BaseObservable() {
 
     // Binding fields.
+    val picturePath: ObservableField<String?> = ObservableField()
+
     val name: ObservableField<String> = ObservableField()
 
     val latitude: ObservableDouble = ObservableDouble(0.0)
@@ -35,7 +37,7 @@ class PlaceFormViewModel(private val messageProvider: PlaceFormMessageProvider,
     val coordinateString: ObservableField<String> = ObservableField()
 
     // Used to binding with spinner for types of place
-    val placeTypes: ObservableList<PlaceType> = ObservableArrayList()
+    val placeTypes: ObservableList<PlaceType> = ObservableArrayList<PlaceType>()
 
     private var navigator: PlaceFormNavigator? = null
 
@@ -65,15 +67,19 @@ class PlaceFormViewModel(private val messageProvider: PlaceFormMessageProvider,
     fun saveButtonClick() {
         if (isNewLocation()) {
             addLocation(name.get(), selectedType.get()!!.id,
-                    latitude.get(), longitude.get(), starred.get())
+                    latitude.get(), longitude.get(), starred.get(), picturePath.get())
         } else {
             updateLocation(name.get()!!, selectedType.get()!!.id,
-                    latitude.get(), longitude.get(), starred.get(), placeId!!)
+                    latitude.get(), longitude.get(), starred.get(), picturePath.get(), placeId!!)
         }
     }
 
     fun locationTextClick() {
-        navigator?.goPickLocation(latitude.get(), longitude.get())
+        navigator?.dispatchPickLocation(latitude.get(), longitude.get())
+    }
+
+    fun pictureClick() {
+        navigator?.dispatchTakePicture()
     }
 
     fun setCoordinate(lat: Double, lon: Double) {
@@ -91,12 +97,13 @@ class PlaceFormViewModel(private val messageProvider: PlaceFormMessageProvider,
         val disposable = typeDataSource.getAllTypes()
                 .observeOn(schedulerProvider.ui())
                 .subscribeOn(schedulerProvider.io())
-                .subscribe({ types ->
+                .subscribe { types ->
+                    placeTypes.addAll(types)
+
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow) {
                         EspressoIdlingResource.decrement()
                     }
-                    placeTypes.addAll(types)
-                })
+                }
         compositeDisposable.add(disposable)
     }
 
@@ -107,15 +114,17 @@ class PlaceFormViewModel(private val messageProvider: PlaceFormMessageProvider,
         val disposable = itemDataSource.getById(placeId)
                 .observeOn(schedulerProvider.ui())
                 .subscribeOn(schedulerProvider.io())
-                .subscribe({ placeItem ->
-                    if (!EspressoIdlingResource.getIdlingResource().isIdleNow) {
-                        EspressoIdlingResource.decrement()
-                    }
+                .subscribe { placeItem ->
+                    picturePath.set(placeItem.picturePath)
                     name.set(placeItem.name)
                     starred.set(placeItem.isStarred)
                     setCoordinate(placeItem.latitude, placeItem.longitude)
                     selectedType.set(placeTypes.first { it.id == placeItem.type })
-                })
+
+                    if (!EspressoIdlingResource.getIdlingResource().isIdleNow) {
+                        EspressoIdlingResource.decrement()
+                    }
+                }
         compositeDisposable.add(disposable)
     }
 
@@ -123,8 +132,9 @@ class PlaceFormViewModel(private val messageProvider: PlaceFormMessageProvider,
                             type: Int,
                             latitude: Double,
                             longitude: Double,
-                            isStarred: Boolean) {
-        val place = PlaceItem(name, latitude, longitude, type, isStarred)
+                            isStarred: Boolean,
+                            picturePath: String?) {
+        val place = PlaceItem(name, latitude, longitude, type, isStarred, picturePath)
         if (place.isEmpty()) {
             errorMessage.set(messageProvider.getErrorEmptyName())
         } else {
@@ -134,12 +144,12 @@ class PlaceFormViewModel(private val messageProvider: PlaceFormMessageProvider,
             val disposable = Completable.fromAction { itemDataSource.addPlace(place) }
                     .observeOn(schedulerProvider.ui())
                     .subscribeOn(schedulerProvider.io())
-                    .subscribe({
+                    .subscribe {
                         if (!EspressoIdlingResource.getIdlingResource().isIdleNow) {
                             EspressoIdlingResource.decrement()
                         }
-                        navigator?.goBackToList()
-                    })
+                        navigator?.dispatchToPlaceList()
+                    }
             compositeDisposable.add(disposable)
         }
     }
@@ -149,8 +159,9 @@ class PlaceFormViewModel(private val messageProvider: PlaceFormMessageProvider,
                                latitude: Double,
                                longitude: Double,
                                isStarred: Boolean,
+                               picturePath: String?,
                                id: String) {
-        val place = PlaceItem(name, latitude, longitude, type, isStarred, id)
+        val place = PlaceItem(name, latitude, longitude, type, isStarred, picturePath, id)
         if (place.isEmpty()) {
             errorMessage.set(messageProvider.getErrorEmptyName())
         } else {
@@ -160,12 +171,12 @@ class PlaceFormViewModel(private val messageProvider: PlaceFormMessageProvider,
             val disposable = Completable.fromAction { itemDataSource.updatePlace(place) }
                     .observeOn(schedulerProvider.ui())
                     .subscribeOn(schedulerProvider.io())
-                    .subscribe({
+                    .subscribe {
                         if (!EspressoIdlingResource.getIdlingResource().isIdleNow) {
                             EspressoIdlingResource.decrement()
                         }
-                        navigator?.goBackToList()
-                    })
+                        navigator?.dispatchToPlaceList()
+                    }
             compositeDisposable.add(disposable)
         }
     }
