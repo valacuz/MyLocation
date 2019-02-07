@@ -9,53 +9,76 @@
             type="com.example.valacuz.mylocations.list.PlaceItemViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/listPreferredItemHeightLarge"
-        android:background="?android:attr/selectableItemBackground"
-        android:onClick="@{() -> viewModel.placeClick()}"
-        android:onLongClick="@{() -> viewModel.placeLongClick()}"
-        android:padding="@dimen/location_item_padding">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="2dp">
 
-        <ImageView
-            android:id="@+id/imageType"
-            location_type="@{viewModel.type}"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:contentDescription="@null"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textName"
-            app:layout_constraintVertical_bias="0.0" />
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:onClick="@{() -> viewModel.placeClick()}"
+            android:onLongClick="@{() -> viewModel.placeLongClick()}">
 
-        <TextView
-            android:id="@+id/textName"
-            style="@style/place_item_primary"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="@{viewModel.name}"
-            app:layout_constraintBottom_toTopOf="@+id/textCoordinate"
-            app:layout_constraintLeft_toRightOf="@+id/imageType"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            app:layout_constraintVertical_chainStyle="packed" />
+            <ImageView
+                android:id="@+id/imagePlace"
+                picture_path="@{viewModel.picturePath}"
+                android:layout_width="0dp"
+                android:layout_height="152dp"
+                android:background="#DDDDDD"
+                android:contentDescription="@null"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias=".0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
 
-        <TextView
-            android:id="@+id/textCoordinate"
-            style="@style/place_item_secondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@{viewModel.coordinateString}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintLeft_toRightOf="@+id/imageType"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textName"
-            app:layout_constraintVertical_chainStyle="packed" />
-    </android.support.constraint.ConstraintLayout>
+            <ImageView
+                android:id="@+id/imageType"
+                location_type="@{viewModel.type}"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="16dp"
+                android:contentDescription="@null"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imagePlace" />
+
+            <TextView
+                android:id="@+id/textName"
+                style="@style/place_item_primary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.name}"
+                app:layout_constraintBottom_toBottomOf="@+id/imagePlace"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/imagePlace"
+                app:layout_constraintVertical_bias="1.0"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <TextView
+                android:id="@+id/textCoordinate"
+                style="@style/place_item_secondary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginStart="16dp"
+                android:text="@{viewModel.coordinateString}"
+                app:layout_constraintBottom_toBottomOf="@+id/imageType"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageType"
+                app:layout_constraintTop_toTopOf="@+id/imageType"
+                app:layout_constraintVertical_chainStyle="packed" />
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v7.widget.CardView>
 </layout>

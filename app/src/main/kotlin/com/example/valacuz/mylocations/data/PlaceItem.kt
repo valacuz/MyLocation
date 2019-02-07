@@ -15,6 +15,7 @@ data class PlaceItem(
         val longitude: Double,
         val type: Int,
         val isStarred: Boolean = false,
+        val picturePath: String? = null,
         val id: String = UUID.randomUUID().toString()) {
 
     fun isEmpty(): Boolean = name.isNullOrEmpty()

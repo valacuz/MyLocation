@@ -15,8 +15,8 @@ class RealmPlaceDataSource private constructor(
 
     override fun getAllPlaces(): Flowable<List<PlaceItem>> {
         return Flowable.defer {
-            Realm.getDefaultInstance().use {
-                val items = it.where(RealmPlaceItem::class.java)
+            Realm.getDefaultInstance().use { realm ->
+                val items = realm.where(RealmPlaceItem::class.java)
                         .findAll()
 
                 if (items != null) {
@@ -30,8 +30,8 @@ class RealmPlaceDataSource private constructor(
 
     override fun getById(placeId: String): Flowable<PlaceItem> {
         return Flowable.defer {
-            Realm.getDefaultInstance().use {
-                val item = it.where(RealmPlaceItem::class.java)
+            Realm.getDefaultInstance().use { realm ->
+                val item = realm.where(RealmPlaceItem::class.java)
                         .equalTo(RealmPlaceItemFields.ID, placeId)
                         .findFirst()
 
@@ -53,12 +53,10 @@ class RealmPlaceDataSource private constructor(
     }
 
     override fun addPlaces(places: List<PlaceItem>) {
-        Realm.getDefaultInstance().use {
-            it.beginTransaction()
-            it.insertOrUpdate(places.map { place: PlaceItem ->
-                place.toRealmPlace()
-            })
-            it.commitTransaction()
+        Realm.getDefaultInstance().use { realm ->
+            realm.beginTransaction()
+            realm.insertOrUpdate(places.map { place -> place.toRealmPlace() })
+            realm.commitTransaction()
             // Update ticks
             updateTicks()
         }
@@ -73,20 +71,20 @@ class RealmPlaceDataSource private constructor(
     }
 
     override fun deletePlace(place: PlaceItem) {
-        Realm.getDefaultInstance().use {
+        Realm.getDefaultInstance().use { realm ->
             // The field name IS NOT match to the name we defined in @RealmField
-            val items = it.where(RealmPlaceItem::class.java)
+            val items = realm.where(RealmPlaceItem::class.java)
                     .equalTo(RealmPlaceItemFields.ID, place.id)
                     .findAll()
 
             if (items.isNotEmpty()) {
-                it.beginTransaction()
+                realm.beginTransaction()
                 val canDelete = items.deleteAllFromRealm()
 
                 if (canDelete) {
-                    it.commitTransaction()
+                    realm.commitTransaction()
                 } else {
-                    it.cancelTransaction()
+                    realm.cancelTransaction()
                     throw Throwable("Cannot delete one or more place(s).")
                 }
             } else {
@@ -96,15 +94,15 @@ class RealmPlaceDataSource private constructor(
     }
 
     override fun clearPlaces() {
-        Realm.getDefaultInstance().use {
-            val items = it.where(RealmPlaceItem::class.java).findAll()
+        Realm.getDefaultInstance().use { realm ->
+            val items = realm.where(RealmPlaceItem::class.java).findAll()
 
             if (items.isNotEmpty()) {
-                it.beginTransaction()
+                realm.beginTransaction()
                 if (items.deleteAllFromRealm()) {
-                    it.commitTransaction()
+                    realm.commitTransaction()
                 } else {
-                    it.cancelTransaction()
+                    realm.cancelTransaction()
                     throw Throwable("Cannot delete one or more place(s).")
                 }
             }

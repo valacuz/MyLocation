@@ -72,20 +72,20 @@ class PlaceFormViewModelTest {
     @Test
     fun callLocationPicker_success() {
         // Mock action for navigator
-        Mockito.`when`(navigator.goPickLocation(0.0, 0.0))
+        Mockito.`when`(navigator.dispatchPickLocation(0.0, 0.0))
                 .thenAnswer { /* Answer nothing, just check method was called or not. */ }
 
         // Given PlaceFormViewModel and When locationTextClick called.
         viewModel.locationTextClick()
 
         // Then navigator should bring us to pick location.
-        Mockito.verify(navigator).goPickLocation(0.0, 0.0)
+        Mockito.verify(navigator).dispatchPickLocation(0.0, 0.0)
     }
 
     @Test
     fun addPlace_success() {
         // Mock action for navigator
-        Mockito.`when`(navigator.goBackToList())
+        Mockito.`when`(navigator.dispatchToPlaceList())
                 .thenAnswer { /* Answer nothing, just check method was called or not */ }
 
         // Given information for place
@@ -99,7 +99,7 @@ class PlaceFormViewModelTest {
         viewModel.saveButtonClick()
 
         // Then the place should be saved & navigator bring us to place list
-        Mockito.verify(navigator).goBackToList()
+        Mockito.verify(navigator).dispatchToPlaceList()
     }
 
     @Test
@@ -124,7 +124,7 @@ class PlaceFormViewModelTest {
     @Test
     fun updatePlace_success() {
         // Mock action for navigator
-        Mockito.`when`(navigator.goBackToList())
+        Mockito.`when`(navigator.dispatchToPlaceList())
                 .thenAnswer { /* Answer nothing, just check method was called or not */ }
 
         val updateViewModel = PlaceFormViewModel(message, placeDataSource, typeDataSource,
@@ -142,7 +142,7 @@ class PlaceFormViewModelTest {
         updateViewModel.saveButtonClick()
 
         // Then the place should be saved & navigator bring us to place list
-        Mockito.verify(navigator).goBackToList()
+        Mockito.verify(navigator).dispatchToPlaceList()
     }
 
     @Test

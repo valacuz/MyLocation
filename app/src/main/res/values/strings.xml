@@ -2,6 +2,7 @@
     <string name="app_name">My Places</string>
 
     <string name="gmap_key" translatable="false">AIzaSyC_CkyaX4jPwmJtV02fJ3sGdJ0rUywS8z8</string>
+    <string name="picture_authorities">com.example.valacuz.mylocations.fileprovider</string>
 
     <!-- Place List -->
     <string name="no_item">No item</string>
@@ -19,6 +20,7 @@
     <string name="form_title_add">New place</string>
     <string name="form_title_edit">Edit place</string>
     <string name="form_menu_save">Save</string>
+    <string name="place_types_prompt">Select place type</string>
 
     <string name="place_name">Place name</string>
     <string name="place_coordinate">Coordinate</string>
