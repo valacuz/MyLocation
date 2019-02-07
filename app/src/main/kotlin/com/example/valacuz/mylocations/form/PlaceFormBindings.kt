@@ -8,9 +8,28 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import android.widget.ImageButton
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.example.valacuz.mylocations.GlideApp
+import com.example.valacuz.mylocations.R
 import com.example.valacuz.mylocations.data.PlaceType
 
 object PlaceFormBindings {
+
+    @BindingAdapter(value = ["picture_path"])
+    @JvmStatic
+    fun setPicture(imageButton: ImageButton, picturePath: String?) {
+        if (!picturePath.isNullOrBlank()) {
+            GlideApp.with(imageButton.context)
+                    .load(picturePath)
+                    .centerCrop()
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .fallback(R.mipmap.icon_no_image)
+                    .into(imageButton)
+        } else {
+            imageButton.setImageResource(R.mipmap.icon_no_image)
+        }
+    }
 
     @BindingAdapter(value = ["typePickAttrChanged", "type_pick", "type_items"], requireAll = false)
     @JvmStatic
@@ -20,8 +39,10 @@ object PlaceFormBindings {
                              items: List<PlaceType>?) {
         if (items != null && items.isNotEmpty()) {
             // Create adapter when its null.
-            spinner.adapter = ArrayAdapter<PlaceType>(spinner.context,
+            val adapter = ArrayAdapter<PlaceType>(spinner.context,
                     android.R.layout.simple_spinner_item, items)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinner.adapter = adapter
 
             // Set index from given items
             if (type != null) {

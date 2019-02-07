@@ -12,8 +12,9 @@ open class RealmPlaceItem(
         @RealmField(name = "longitude") var longitude: Double,
         @RealmField(name = "place_type") var type: Int,
         @RealmField(name = "starred") var isStarred: Boolean = false,
+        @RealmField(name = "picture_path") var picturePath: String?,
         @RealmField(name = "place_id") @PrimaryKey var id: String)
     : RealmObject() {
 
-    constructor() : this(null, 0.0, 0.0, 0, false, "")
+    constructor() : this(null, 0.0, 0.0, 0, false, null, "")
 }

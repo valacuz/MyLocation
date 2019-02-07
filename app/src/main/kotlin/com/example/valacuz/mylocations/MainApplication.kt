@@ -17,8 +17,13 @@ open class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        configureRealm()    // Config realm database
-        placeComponent = createPlaceTypeComponent() // Config dagger2
+        configureRealm()
+        placeComponent = createPlaceTypeComponent()
+    }
+
+    override fun onTerminate() {
+        Realm.getDefaultInstance().close()
+        super.onTerminate()
     }
 
     protected open fun createPlaceTypeComponent(): PlaceComponent {
@@ -35,6 +40,7 @@ open class MainApplication : Application() {
 
         val config = RealmConfiguration.Builder()
                 .name("realm_my_location.realm")
+                .schemaVersion(2)
                 .build()
         Realm.setDefaultConfiguration(config)
     }

@@ -4,7 +4,13 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+
+    <uses-feature
+        android:name="android.hardware.camera2"
+        android:required="true" />
 
     <application
         android:name=".MainApplication"
@@ -22,6 +28,16 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/gmap_key" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="@string/picture_authorities"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/camera_file_paths" />
+        </provider>
 
         <activity android:name=".list.PlaceListActivity">
             <intent-filter>

@@ -2,7 +2,9 @@ package com.example.valacuz.mylocations.form
 
 interface PlaceFormNavigator {
 
-    fun goBackToList()
+    fun dispatchToPlaceList()
 
-    fun goPickLocation(latitude: Double?, longitude: Double?)
+    fun dispatchPickLocation(latitude: Double?, longitude: Double?)
+
+    fun dispatchTakePicture()
 }

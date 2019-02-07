@@ -79,6 +79,6 @@ before_script:
 
 script:
   # Run local unit test (don't deploy application)
-  - ./gradlew test
+  - ./gradlew testMockDebugUnitTest
   # Run Instrumented unit test (deploy application)
-  # - ./gradlew connectedAndroidTest
+  # - ./gradlew connectedMockDebugAndroidTest
