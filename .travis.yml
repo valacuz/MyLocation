@@ -13,9 +13,9 @@ cache:
 
 env:
   global:
-    - BUILD_TOOL_VERSION=27.0.3
+    - BUILD_TOOL_VERSION=28.0.3
     - EMULATOR_API_LEVEL=23
-    - ANDROID_API_LEVEL=27
+    - ANDROID_API_LEVEL=28
     - ANDROID_ABI=armeabi-v7a
     - ANDROID_TAG=google_apis
     - ADB_INSTALL_TIMEOUT=5 # 2 Minutes by default
